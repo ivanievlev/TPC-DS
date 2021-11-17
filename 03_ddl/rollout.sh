@@ -15,7 +15,7 @@ SINGLE_USER_ITERATIONS=$5
 #luka multiplying qiantity of partitions with EVERY=1 parameter in DDL
 #EVERY is used for web_returns, it was "180" in a classic TPC-DS RunningJon
 # Change it less than 180 to create more partitions
-EVERY="10"
+EVERY="1"
 
 
 
