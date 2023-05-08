@@ -76,7 +76,9 @@ init_log()
 	fi
 
 	logfile=rollout_$1.log
-	rm -f $LOCAL_PWD/log/$logfile
+	A bug when process expects rollout_sql.log occures and I replaced rm for empty 
+	> $LOCAL_PWD/log/$logfile
+	#rm -f $LOCAL_PWD/log/$logfile
 }
 
 start_log()
