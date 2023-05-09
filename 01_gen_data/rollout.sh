@@ -5,6 +5,9 @@ PWD=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source $PWD/../functions.sh
 source_bashrc
 
+step=gen_data
+init_log $step
+
 GEN_DATA_SCALE=$1
 
 if [ "$GEN_DATA_SCALE" == "" ]; then
@@ -95,8 +98,8 @@ gen_data()
 	fi
 }
 
-step=gen_data
-init_log $step
+#step=gen_data
+#init_log $step
 start_log
 schema_name="tpcds"
 table_name="gen_data"

@@ -61,7 +61,7 @@ get_version()
 		else
 			SMALL_STORAGE="appendonly=true, orientation=column"
 			MEDIUM_STORAGE="appendonly=true, orientation=column"
-			LARGE_STORAGE="appendonly=true, orientation=column, compresstype=zlib, compresslevel=4"
+			LARGE_STORAGE="appendonly=true, orientation=column, compresstype=zstd, compresslevel=4"
 		fi
 	else
 		SMALL_STORAGE=""
@@ -72,11 +72,15 @@ get_version()
 init_log()
 {
 	if [ -f $LOCAL_PWD/log/end_$1.log ]; then
+		echo "We are skipping step $1"
 		exit 0
+	else
+		echo "end_$1.log is absent so we are starting step $1"
 	fi
 
 	logfile=rollout_$1.log
-	rm -f $LOCAL_PWD/log/$logfile
+	#rm -f $LOCAL_PWD/log/$logfile
+	> $LOCAL_PWD/log/$logfile
 }
 
 start_log()

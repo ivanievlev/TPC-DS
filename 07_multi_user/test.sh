@@ -73,6 +73,8 @@ for z in "${arr[@]}"; do
 done
 
 tuples="0"
+
+
 for i in $(ls $sql_dir/*.sql); do
 
 	start_log
