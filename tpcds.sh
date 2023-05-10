@@ -69,7 +69,7 @@ check_variables()
 	fi
         local count=$(grep "PARTITION_EVERY_FACTOR" $MYVAR | wc -l)
         if [ "$count" -eq "0" ]; then
-                echo "PARTITION_EVERY_FACTOR=\"50\"" >> $MYVAR
+                echo "PARTITION_EVERY_FACTOR=\"1\"" >> $MYVAR
                 new_variable=$(($new_variable + 1))
         fi
 	#00
