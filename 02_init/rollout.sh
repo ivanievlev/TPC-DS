@@ -120,12 +120,25 @@ set_memory_limit()
 	psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET MEMORY_SHARED_QUOTA 80;"
 }
 
+set_workfile_limits()
+{
+	echo "gpconfig -c gp_workfile_limit_per_query -v 0"
+	gpconfig -c gp_workfile_limit_per_query -v 0
+        echo "gpconfig -c gp_workfile_limit_per_segment -v 0"
+        gpconfig -c gp_workfile_limit_per_segment -v 0
+        echo "gpconfig -c gp_workfile_limit_files_per_query -v 0"
+        gpconfig -c gp_workfile_limit_files_per_query -v 0
+        echo "gpstop -r"
+        gpstop -aqrM fast
+}
+
 get_version
 if [[ "$VERSION" == *"gpdb"* ]]; then
 	set_segment_bashrc
 	check_gucs
 	copy_config
 	set_memory_limit
+	set_workfile_limits 
 fi
 set_search_path
 
