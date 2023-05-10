@@ -61,7 +61,7 @@ get_version()
 		else
 			SMALL_STORAGE="appendonly=true, orientation=column"
 			MEDIUM_STORAGE="appendonly=true, orientation=column"
-			LARGE_STORAGE="appendonly=true, orientation=column, compresstype=zstd, compresslevel=4"
+			LARGE_STORAGE="appendonly=true, orientation=column, compresstype=zstd, compresslevel=5"
 		fi
 	else
 		SMALL_STORAGE=""
