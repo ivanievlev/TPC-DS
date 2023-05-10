@@ -80,7 +80,7 @@ init_log()
 
 	logfile=rollout_$1.log
 
-	A bug when process expects rollout_sql.log occures and I replaced rm for empty 
+	#A bug when process expects rollout_sql.log occures and I replaced rm for empty 
 	> $LOCAL_PWD/log/$logfile
 	#rm -f $LOCAL_PWD/log/$logfile
 }
