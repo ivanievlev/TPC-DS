@@ -8,6 +8,7 @@ source $PWD/../functions.sh
 GEN_DATA_SCALE=$1
 session_id=$2
 EXPLAIN_ANALYZE=$3
+EXCLUDE_HEAVY_QUERIES=$4
 
 if [[ "$GEN_DATA_SCALE" == "" || "$session_id" == "" || "$EXPLAIN_ANALYZE" == "" ]]; then
 	echo "Error: you must provide the scale, the session id, and true/false to run explain analyze as parameters."
@@ -46,13 +47,13 @@ for p in $(seq 1 99); do
 	filename=$file_id.query.$q.sql
 
 	#add explain analyze 
-	echo "echo \":EXPLAIN_ANALYZE\" > $sql_dir/$filename"
+	#echo "echo \":EXPLAIN_ANALYZE\" > $sql_dir/$filename"
 	echo ":EXPLAIN_ANALYZE" > $sql_dir/$filename
 
-	echo "sed -n \"$start_position\",\"$end_position\"p $sql_dir/$tpcds_query_name >> $sql_dir/$filename"
+	#echo "sed -n \"$start_position\",\"$end_position\"p $sql_dir/$tpcds_query_name >> $sql_dir/$filename"
 	sed -n "$start_position","$end_position"p $sql_dir/$tpcds_query_name >> $sql_dir/$filename
 	query_id=$(($query_id + 1))
-	echo "Completed: $sql_dir/$filename"
+	#echo "Completed: $sql_dir/$filename"
 done
 echo "rm -f $sql_dir/query_*.sql"
 rm -f $sql_dir/$tpcds_query_name
@@ -76,9 +77,17 @@ tuples="0"
 
 
 for i in $(ls $sql_dir/*.sql); do
+	id=$i
+        qnum=`echo $i | awk -F '.' '{print $3}'`
+        if [ "$EXCLUDE_HEAVY_QUERIES" == "true" ]; then
+
+                if [[ "$qnum" == "23" || "$qnum" == "24" || "$qnum" == "67" ]]; then
+                        echo "Skipping $i due to EXCLUDE_HEAVY_QUERIES=true."
+                continue
+                fi
+	fi
 
 	start_log
-	id=$i
 	schema_name=$session_id
 	table_name=$(basename $i | awk -F '.' '{print $3}')
 
