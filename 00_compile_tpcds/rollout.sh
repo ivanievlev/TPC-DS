@@ -11,6 +11,8 @@ start_log
 schema_name="tpcds"
 table_name="compile"
 
+sudo su - gpadmin -c 'psql postgres -c "create database gpadmin"'
+
 make_tpc()
 {
 	#compile the tools
