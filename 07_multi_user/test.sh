@@ -81,7 +81,56 @@ for i in $(ls $sql_dir/*.sql); do
         qnum=`echo $i | awk -F '.' '{print $3}'`
         if [ "$EXCLUDE_HEAVY_QUERIES" == "true" ]; then
 
-                if [[ "$qnum" == "23" || "$qnum" == "24" || "$qnum" == "67" ]]; then
+                if [[
+                "$qnum" == "02" ||
+                "$qnum" == "04" ||
+                "$qnum" == "05" ||
+                "$qnum" == "09" ||
+                "$qnum" == "10" ||
+                "$qnum" == "11" ||
+                "$qnum" == "14" ||
+                "$qnum" == "16" ||
+                "$qnum" == "17" ||
+                "$qnum" == "18" ||
+                "$qnum" == "22" ||
+                "$qnum" == "23" ||
+                "$qnum" == "24" ||
+                "$qnum" == "25" ||
+                "$qnum" == "28" ||
+                "$qnum" == "29" ||
+                "$qnum" == "31" ||
+                "$qnum" == "35" ||
+                "$qnum" == "36" ||
+                "$qnum" == "38" ||
+                "$qnum" == "39" ||
+                "$qnum" == "44" ||
+                "$qnum" == "46" ||
+                "$qnum" == "47" ||
+                "$qnum" == "50" ||
+                "$qnum" == "51" ||
+                "$qnum" == "57" ||
+                "$qnum" == "59" ||
+                "$qnum" == "64" ||
+                "$qnum" == "65" ||
+                "$qnum" == "67" ||
+                "$qnum" == "70" ||
+                "$qnum" == "72" ||
+                "$qnum" == "74" ||
+                "$qnum" == "75" ||
+                "$qnum" == "76" ||
+                "$qnum" == "78" ||
+                "$qnum" == "79" ||
+                "$qnum" == "80" ||
+                "$qnum" == "82" ||
+                "$qnum" == "87" ||
+                "$qnum" == "88" ||
+                "$qnum" == "93" ||
+                "$qnum" == "94" ||
+                "$qnum" == "95" ||
+                "$qnum" == "96" ||
+                "$qnum" == "97" ||
+                "$qnum" == "99" ]]; then
+
                         echo "Skipping $i due to EXCLUDE_HEAVY_QUERIES=true."
                 continue
                 fi
