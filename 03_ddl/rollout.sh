@@ -11,6 +11,7 @@ RANDOM_DISTRIBUTION=$3
 MULTI_USER_COUNT=$4
 SINGLE_USER_ITERATIONS=$5
 PARTITION_EVERY_FACTOR=$6
+EXTRA_TPCDS_QUERIES=$8
 
 #luka multiplying qiantity of partitions with EVERY=1 parameter in DDL
 #EVERY_WEB_RETURNS is used for web_returns, it is by default "180" in a classic TPC-DS RunningJon
@@ -94,11 +95,12 @@ for i in $(ls $PWD/*.$filter.*.sql); do
 done
 }
 
+echo "Creating DDL for schema TPCDS"
 create_tables "tpcds"
 
 for i in $(seq 1 $EXTRA_TPCDS_QUERIES); do
         schema="tpcds$i"
-	echo "schema = $schema"
+	echo "Creating DDL for schema $schema"
         create_tables "$schema"
 done
 
