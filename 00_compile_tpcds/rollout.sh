@@ -5,13 +5,18 @@ PWD=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source $PWD/../functions.sh
 source_bashrc
 
+IS_DB_EXIST=$(psql -d postgres -v ON_ERROR_STOP=1 -q -A -t -c "select count(*) from pg_database where datname = 'gpadmin'")
+echo "IS_DB_EXIST = $IS_DB_EXIST"
+
+if [[ "$IS_DB_EXIST" == "0" ]]; then
+        sudo su - gpadmin -c 'psql postgres -c "create database gpadmin"'
+fi
+
 step=compile_tpcds
 init_log $step
 start_log
 schema_name="tpcds"
 table_name="compile"
-
-sudo su - gpadmin -c 'psql postgres -c "create database gpadmin"'
 
 make_tpc()
 {
