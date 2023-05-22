@@ -112,13 +112,7 @@ set_search_path()
 	psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER USER $USER SET search_path=$schema_name,public;"
 }
 #luka added set memory_limit and memory_shared_quota because with EVERY=1 too much partitions caused Canceling query 020.gpdb.web_returns.sql because of high VMEM usage
-set_memory_limit()
-{
-	echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET MEMORY_LIMIT 80;\""
-	psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET MEMORY_LIMIT 80;"
-	echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET MEMORY_SHARED_QUOTA 80;\""
-	psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET MEMORY_SHARED_QUOTA 80;"
-}
+
 
 set_workfile_limits()
 {
@@ -137,7 +131,19 @@ if [[ "$VERSION" == *"gpdb"* ]]; then
 	set_segment_bashrc
 	check_gucs
 	copy_config
-	set_memory_limit
+	if [[ "$VERSION" == "gpdb_6" ]]; then
+        	echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET MEMORY_LIMIT 80;\""
+        	psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET MEMORY_LIMIT 80;"
+		echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET MEMORY_SHARED_QUOTA 80;\""
+        	psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET MEMORY_SHARED_QUOTA 80;"
+
+	elif [[ "$VERSION" == "gpdb_7" ]]; then
+        	echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET MEMORY_LIMIT 80;\""
+        	psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET MEMORY_LIMIT 80;"
+		echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group and default_group SET CPU_HARD_QUOTA_LIMIT 90;\""
+		psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET CPU_HARD_QUOTA_LIMIT 90;"
+		psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP default_group SET CPU_HARD_QUOTA_LIMIT 90;"
+	fi
 	set_workfile_limits 
 fi
 set_search_path
