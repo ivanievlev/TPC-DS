@@ -5,6 +5,7 @@ PWD=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source $PWD/../functions.sh
 source_bashrc
 
+TRUNCATE_BEFORE_LOAD=$9
 step=load
 init_log $step
 
@@ -64,6 +65,11 @@ start_gpfdist()
 		done
 	fi
 }
+
+if [ "$TRUNCATE_BEFORE_LOAD" == "true" ]; then
+	echo "psql -v ON_ERROR_STOP=1 -f 000.truncate.sql"
+	psql -v ON_ERROR_STOP=1 -f $PWD/000.truncate.sql
+fi
 
 if [[ "$VERSION" == *"gpdb"* ]]; then
 	copy_script

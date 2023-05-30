@@ -1,0 +1,25 @@
+TRUNCATE table tpcds.time_dim;
+TRUNCATE table tpcds.ship_mode;
+TRUNCATE table tpcds.reason;
+TRUNCATE table tpcds.income_band;
+TRUNCATE table tpcds.item;
+TRUNCATE table tpcds.date_dim;
+TRUNCATE table tpcds.customer_demographics;
+TRUNCATE table tpcds.customer_address;
+TRUNCATE table tpcds.warehouse;
+TRUNCATE table tpcds.promotion;
+TRUNCATE table tpcds.household_demographics;
+TRUNCATE table tpcds.customer;
+TRUNCATE table tpcds.web_page;
+TRUNCATE table tpcds.web_site;
+TRUNCATE table tpcds.catalog_page;
+TRUNCATE table tpcds.call_center;
+TRUNCATE table tpcds.store;
+TRUNCATE table tpcds.inventory;
+TRUNCATE table tpcds.web_sales;
+TRUNCATE table tpcds.web_returns;
+TRUNCATE table tpcds.catalog_sales;
+TRUNCATE table tpcds.catalog_returns;
+TRUNCATE table tpcds.store_sales;
+TRUNCATE table tpcds.store_returns;
+
