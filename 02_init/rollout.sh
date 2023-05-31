@@ -136,6 +136,10 @@ if [[ "$VERSION" == *"gpdb"* ]]; then
         	psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET MEMORY_LIMIT 80;"
 		echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET MEMORY_SHARED_QUOTA 80;\""
         	psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET MEMORY_SHARED_QUOTA 80;"
+		echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET CONCURRENCY 100;\""
+                psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET CONCURRENCY 100;"
+		echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET CPU_RATE_LIMIT 70;\""
+                psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET CPU_RATE_LIMIT 70;"
 
 	elif [[ "$VERSION" == "gpdb_7" ]]; then
         	echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET MEMORY_LIMIT 80;\""
@@ -143,11 +147,16 @@ if [[ "$VERSION" == *"gpdb"* ]]; then
 		echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group and default_group SET CPU_HARD_QUOTA_LIMIT 90;\""
 		psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET CPU_HARD_QUOTA_LIMIT 90;"
 		psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP default_group SET CPU_HARD_QUOTA_LIMIT 90;"
+                echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET CONCURRENCY 100;\""
+                psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET CONCURRENCY 100;"
+                echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET CPU_RATE_LIMIT 70;\""
+                psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET CPU_RATE_LIMIT 70;"
+
 	fi
 	set_workfile_limits 
 fi
 set_search_path
-
+export PGUSER=luka
 log
 
 end_step $step
