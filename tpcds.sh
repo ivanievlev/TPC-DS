@@ -89,6 +89,12 @@ check_variables()
                 new_variable=$(($new_variable + 1))
 
         fi
+        local count=$(grep "SQL_ON_ERROR_STOP" $MYVAR | wc -l)
+        if [ "$count" -eq "0" ]; then
+                echo "SQL_ON_ERROR_STOP=\"true\"" >> $MYVAR
+                new_variable=$(($new_variable + 1))
+
+        fi
 
 	#00
 	local count=$(grep "RUN_COMPILE_TPCDS" $MYVAR | wc -l)
@@ -303,6 +309,7 @@ echo_variables()
 	echo "EXCLUDE_HEAVY_QUERIES: $EXCLUDE_HEAVY_QUERIES"
         echo "EXTRA_TPCDS_SCHEMAS: $EXTRA_TPCDS_SCHEMAS"
 	echo "TRUNCATE_BEFORE_LOAD: $TRUNCATE_BEFORE_LOAD"
+	echo "SQL_ON_ERROR_STOP: $SQL_ON_ERROR_STOP"
 	echo "############################################################################"
 	echo ""
 }
@@ -318,4 +325,4 @@ yum_installs
 script_check
 echo_variables
 
-su -l $ADMIN_USER -c "cd \"$INSTALL_DIR/$REPO\"; ./rollout.sh $GEN_DATA_SCALE $EXPLAIN_ANALYZE $RANDOM_DISTRIBUTION $MULTI_USER_COUNT $RUN_COMPILE_TPCDS $RUN_GEN_DATA $RUN_INIT $RUN_DDL $RUN_LOAD $RUN_SQL $RUN_SINGLE_USER_REPORT $RUN_MULTI_USER $RUN_MULTI_USER_REPORT $RUN_SCORE $SINGLE_USER_ITERATIONS $PARTITION_EVERY_FACTOR $EXCLUDE_HEAVY_QUERIES $EXTRA_TPCDS_SCHEMAS $TRUNCATE_BEFORE_LOAD"
+su -l $ADMIN_USER -c "cd \"$INSTALL_DIR/$REPO\"; ./rollout.sh $GEN_DATA_SCALE $EXPLAIN_ANALYZE $RANDOM_DISTRIBUTION $MULTI_USER_COUNT $RUN_COMPILE_TPCDS $RUN_GEN_DATA $RUN_INIT $RUN_DDL $RUN_LOAD $RUN_SQL $RUN_SINGLE_USER_REPORT $RUN_MULTI_USER $RUN_MULTI_USER_REPORT $RUN_SCORE $SINGLE_USER_ITERATIONS $PARTITION_EVERY_FACTOR $EXCLUDE_HEAVY_QUERIES $EXTRA_TPCDS_SCHEMAS $TRUNCATE_BEFORE_LOAD $SQL_ON_ERROR_STOP"

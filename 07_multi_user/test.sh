@@ -9,6 +9,7 @@ GEN_DATA_SCALE=$1
 session_id=$2
 EXPLAIN_ANALYZE=$3
 EXCLUDE_HEAVY_QUERIES=$4
+SQL_ON_ERROR_STOP=$5
 
 if [[ "$GEN_DATA_SCALE" == "" || "$session_id" == "" || "$EXPLAIN_ANALYZE" == "" ]]; then
 	echo "Error: you must provide the scale, the session id, and true/false to run explain analyze as parameters."
@@ -22,6 +23,13 @@ source_bashrc
 step=testing_$session_id
 
 init_log $step
+
+if [ "$SQL_ON_ERROR_STOP" == "true" ]; then
+        ON_ERROR_STOP=1
+else
+        ON_ERROR_STOP=0
+fi
+
 
 sql_dir=$PWD/$session_id
 #going from 1 base to 0 base
@@ -141,14 +149,14 @@ for i in $(ls $sql_dir/*.sql); do
 	table_name=$(basename $i | awk -F '.' '{print $3}')
 
 	if [ "$EXPLAIN_ANALYZE" == "false" ]; then
-		echo "psql -v ON_ERROR_STOP=1 -A -q -t -P pager=off -v EXPLAIN_ANALYZE="" -f $i | wc -l"
-		tuples=$(psql -v ON_ERROR_STOP=1 -A -q -t -P pager=off -v EXPLAIN_ANALYZE="" -f $i | wc -l; exit ${PIPESTATUS[0]})
+		echo "psql -v ON_ERROR_STOP=$ON_ERROR_STOP -A -q -t -P pager=off -v EXPLAIN_ANALYZE="" -f $i | wc -l"
+		tuples=$(psql -v ON_ERROR_STOP=$ON_ERROR_STOP -A -q -t -P pager=off -v EXPLAIN_ANALYZE="" -f $i | wc -l; exit ${PIPESTATUS[0]})
 		tuples=$(($tuples-1))
 	else
 		myfilename=$(basename $i)
 		mylogfile=$PWD/../log/"$session_id"".""$myfilename"".multi.explain_analyze.log"
-		echo "psql -v ON_ERROR_STOP=1 -A -q -t -P pager=off -v EXPLAIN_ANALYZE=\"EXPLAIN ANALYZE\" -f $i"
-		psql -v ON_ERROR_STOP=1 -A -q -t -P pager=off -v EXPLAIN_ANALYZE="EXPLAIN ANALYZE" -f $i > $mylogfile
+		echo "psql -v ON_ERROR_STOP=$ON_ERROR_STOP -A -q -t -P pager=off -v EXPLAIN_ANALYZE=\"EXPLAIN ANALYZE\" -f $i"
+		psql -v ON_ERROR_STOP=$ON_ERROR_STOP -A -q -t -P pager=off -v EXPLAIN_ANALYZE="EXPLAIN ANALYZE" -f $i > $mylogfile
 		tuples="0"
 	fi
 		
