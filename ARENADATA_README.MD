@@ -9,8 +9,10 @@
 
 ```
 sudo su
-curl https://raw.githubusercontent.com/ivanievlev/TPC-DS/master/tpcds.sh > tpcds.sh
-chmod 755 tpcds.sh
+mkdir /arenadata; cd /arenadata
+git clone https://github.com/ivanievlev/TPC-DS.git
+cd TPC-DS/
+chmod 777 $(find /arenadata -type d)
 
 <preliminary run to get paramater file>
 nohup ./tpcds.sh > tpcds.log 2>&1 < tpcds.log &
