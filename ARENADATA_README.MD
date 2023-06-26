@@ -5,6 +5,27 @@
 - Changed compression options from quicklz to zstd
 - Added new paramaters
 
+## Installation
+
+```
+sudo su
+curl https://raw.githubusercontent.com/ivanievlev/TPC-DS/master/tpcds.sh > tpcds.sh
+chmod 755 tpcds.sh
+
+<preliminary run to get paramater file>
+nohup ./tpcds.sh > tpcds.log 2>&1 < tpcds.log &
+
+<editing parameters>
+nano tpcds_variables.sh
+
+<main run>
+nohup ./tpcds.sh > tpcds.log 2>&1 < tpcds.log &
+
+<watching the log>
+tail -f tpcds.log 
+
+```
+
 ## Basic parameters
 
 - REPO="TPC-DS"
