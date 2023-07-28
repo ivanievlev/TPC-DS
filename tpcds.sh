@@ -156,6 +156,49 @@ check_variables()
 		echo "RUN_SCORE=\"true\"" >> $MYVAR
 		new_variable=$(($new_variable + 1))
 	fi
+
+	local count=$(grep "net_core_rmem" $MYVAR | wc -l)
+        if [ "$count" -eq "0" ]; then
+                echo "net_core_rmem=\"26214400\"" >> $MYVAR
+                new_variable=$(($new_variable + 1))
+        fi
+
+		local count=$(grep "net_core_wmem" $MYVAR | wc -l)
+        if [ "$count" -eq "0" ]; then
+                echo "net_core_wmem=\"26214400\"" >> $MYVAR
+                new_variable=$(($new_variable + 1))
+        fi
+
+		local count=$(grep "rg6_memory_limit" $MYVAR | wc -l)
+        if [ "$count" -eq "0" ]; then
+                echo "rg6_memory_limit=\"80\"" >> $MYVAR
+                new_variable=$(($new_variable + 1))
+        fi
+
+		local count=$(grep "rg6_memory_shared_quota" $MYVAR | wc -l)
+        if [ "$count" -eq "0" ]; then
+                echo "rg6_memory_shared_quota=\"80\"" >> $MYVAR
+                new_variable=$(($new_variable + 1))
+        fi
+
+		local count=$(grep "rg6_concurrency" $MYVAR | wc -l)
+        if [ "$count" -eq "0" ]; then
+                echo "rg6_concurrency=\"100\"" >> $MYVAR
+                new_variable=$(($new_variable + 1))
+        fi
+		
+		local count=$(grep "rg6_cpu_rate_limit" $MYVAR | wc -l)
+        if [ "$count" -eq "0" ]; then
+                echo "rg6_cpu_rate_limit=\"70\"" >> $MYVAR
+                new_variable=$(($new_variable + 1))
+        fi
+		
+		local count=$(grep "rg7_cpu_hard_quota_limit" $MYVAR | wc -l)
+        if [ "$count" -eq "0" ]; then
+                echo "rg7_cpu_hard_quota_limit=\"100\"" >> $MYVAR
+                new_variable=$(($new_variable + 1))
+        fi
+
         
 
 	if [ "$new_variable" -gt "0" ]; then
@@ -310,6 +353,13 @@ echo_variables()
         echo "EXTRA_TPCDS_SCHEMAS: $EXTRA_TPCDS_SCHEMAS"
 	echo "TRUNCATE_BEFORE_LOAD: $TRUNCATE_BEFORE_LOAD"
 	echo "SQL_ON_ERROR_STOP: $SQL_ON_ERROR_STOP"
+	echo "net_core_rmem: $net_core_rmem"
+	echo "net_core_wmem: $net_core_wmem"
+	echo "rg6_memory_limit: $rg6_memory_limit"
+	echo "rg6_memory_shared_quota: $rg6_memory_shared_quota"
+	echo "rg6_concurrency: $rg6_concurrency"
+	echo "rg6_cpu_rate_limit: $rg6_cpu_rate_limit"
+	echo "rg7_cpu_hard_quota_limit: $rg7_cpu_hard_quota_limit"
 	echo "############################################################################"
 	echo ""
 }
@@ -325,4 +375,4 @@ yum_installs
 script_check
 echo_variables
 
-su -l $ADMIN_USER -c "cd \"$INSTALL_DIR/$REPO\"; ./rollout.sh $GEN_DATA_SCALE $EXPLAIN_ANALYZE $RANDOM_DISTRIBUTION $MULTI_USER_COUNT $RUN_COMPILE_TPCDS $RUN_GEN_DATA $RUN_INIT $RUN_DDL $RUN_LOAD $RUN_SQL $RUN_SINGLE_USER_REPORT $RUN_MULTI_USER $RUN_MULTI_USER_REPORT $RUN_SCORE $SINGLE_USER_ITERATIONS $PARTITION_EVERY_FACTOR $EXCLUDE_HEAVY_QUERIES $EXTRA_TPCDS_SCHEMAS $TRUNCATE_BEFORE_LOAD $SQL_ON_ERROR_STOP"
+su -l $ADMIN_USER -c "cd \"$INSTALL_DIR/$REPO\"; ./rollout.sh $GEN_DATA_SCALE $EXPLAIN_ANALYZE $RANDOM_DISTRIBUTION $MULTI_USER_COUNT $RUN_COMPILE_TPCDS $RUN_GEN_DATA $RUN_INIT $RUN_DDL $RUN_LOAD $RUN_SQL $RUN_SINGLE_USER_REPORT $RUN_MULTI_USER $RUN_MULTI_USER_REPORT $RUN_SCORE $SINGLE_USER_ITERATIONS $PARTITION_EVERY_FACTOR $EXCLUDE_HEAVY_QUERIES $EXTRA_TPCDS_SCHEMAS $TRUNCATE_BEFORE_LOAD $SQL_ON_ERROR_STOP $net_core_rmem $net_core_wmem $rg6_memory_limit $rg6_memory_shared_quota $rg6_concurrency $rg6_cpu_rate_limit $rg7_cpu_hard_quota_limit"

@@ -25,6 +25,13 @@ EXCLUDE_HEAVY_QUERIES="${17}"
 EXTRA_TPCDS_SCHEMAS="${18}"
 TRUNCATE_BEFORE_LOAD="${19}"
 SQL_ON_ERROR_STOP="${20}"
+net_core_rmem="${21}"
+net_core_wmem="${22}"
+rg6_memory_limit="${23}"
+rg6_memory_shared_quota="${24}"
+rg6_concurrency="${25}"
+rg6_cpu_rate_limit="${26}"
+rg7_cpu_hard_quota_limit="${27}"
 
 if [[ "$GEN_DATA_SCALE" == "" || "$EXPLAIN_ANALYZE" == "" || "$RANDOM_DISTRIBUTION" == "" || "$MULTI_USER_COUNT" == "" || "$RUN_COMPILE_TPCDS" == "" || "$RUN_GEN_DATA" == "" || "$RUN_INIT" == "" || "$RUN_DDL" == "" || "$RUN_LOAD" == "" || "$RUN_SQL" == "" || "$RUN_SINGLE_USER_REPORT" == "" || "$RUN_MULTI_USER" == "" || "$RUN_MULTI_USER_REPORT" == "" || "$RUN_SCORE" == "" || "$SINGLE_USER_ITERATIONS" == "" ]]; then
 	echo "Please run this script from tpcds.sh so the correct parameters are passed to it."
@@ -66,6 +73,14 @@ echo "EXCLUDE_HEAVY_QUERIES: $EXCLUDE_HEAVY_QUERIES"
 echo "EXTRA_TPCDS_SCHEMAS: $EXTRA_TPCDS_SCHEMAS"
 echo "TRUNCATE_BEFORE_LOAD: $TRUNCATE_BEFORE_LOAD"
 echo "SQL_ON_ERROR_STOP: $SQL_ON_ERROR_STOP"
+echo "net_core_rmem: $net_core_rmem"
+echo "net_core_wmem: $net_core_wmem"
+echo "rg6_memory_limit: $rg6_memory_limit"
+echo "rg6_memory_shared_quota: $rg6_memory_shared_quota"
+echo "rg6_concurrency: $rg6_concurrency"
+echo "rg6_cpu_rate_limit: $rg6_cpu_rate_limit"
+echo "rg7_cpu_hard_quota_limit: $rg7_cpu_hard_quota_limit"
+
 echo "############################################################################"
 echo ""
 if [ "$RUN_COMPILE_TPCDS" == "true" ]; then
@@ -105,5 +120,5 @@ fi
 
 for i in $(ls -d $PWD/0*); do
 	echo "$i/rollout.sh"
-	$i/rollout.sh $GEN_DATA_SCALE $EXPLAIN_ANALYZE $RANDOM_DISTRIBUTION $MULTI_USER_COUNT $SINGLE_USER_ITERATIONS $PARTITION_EVERY_FACTOR $EXCLUDE_HEAVY_QUERIES $EXTRA_TPCDS_SCHEMAS $TRUNCATE_BEFORE_LOAD $SQL_ON_ERROR_STOP
+	$i/rollout.sh $GEN_DATA_SCALE $EXPLAIN_ANALYZE $RANDOM_DISTRIBUTION $MULTI_USER_COUNT $SINGLE_USER_ITERATIONS $PARTITION_EVERY_FACTOR $EXCLUDE_HEAVY_QUERIES $EXTRA_TPCDS_SCHEMAS $TRUNCATE_BEFORE_LOAD $SQL_ON_ERROR_STOP $net_core_rmem $net_core_wmem $rg6_memory_limit $rg6_memory_shared_quota $rg6_concurrency $rg6_cpu_rate_limit $rg7_cpu_hard_quota_limit
 done

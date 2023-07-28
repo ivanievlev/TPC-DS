@@ -5,6 +5,14 @@ PWD=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source $PWD/../functions.sh
 source_bashrc
 
+net_core_rmem=${11}
+net_core_wmem=${12}
+rg6_memory_limit=${13}
+rg6_memory_shared_quota=${14}
+rg6_concurrency=${15}
+rg6_cpu_rate_limit=${16}
+rg7_cpu_hard_quota_limit=${17}
+
 step=init
 init_log $step
 start_log
@@ -126,34 +134,47 @@ set_workfile_limits()
         gpstop -aqrM fast
 }
 
+set_net_core_mem()
+{
+	echo "sysctl -w net.core.rmem_max=$net_core_rmem"
+	sudo sysctl -w net.core.rmem_max=$net_core_rmem
+	echo "sysctl -w net.core.rmem_default=$net_core_rmem"
+	sudo sysctl -w net.core.rmem_default=$net_core_rmem
+	echo "sysctl -w net.core.wmem_max=$net_core_wmem"
+	sudo sysctl -w net.core.wmem_max=$net_core_wmem
+	echo "sysctl -w net.core.wmem_default=$net_core_wmem"
+	sudo sysctl -w net.core.wmem_default=$net_core_wmem
+}
+
 get_version
 if [[ "$VERSION" == *"gpdb"* ]]; then
 	set_segment_bashrc
 	check_gucs
 	copy_config
 	if [[ "$VERSION" == "gpdb_6" ]]; then
-        	echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET MEMORY_LIMIT 80;\""
-        	psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET MEMORY_LIMIT 80;"
-		echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET MEMORY_SHARED_QUOTA 80;\""
-        	psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET MEMORY_SHARED_QUOTA 80;"
-		echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET CONCURRENCY 100;\""
-                psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET CONCURRENCY 100;"
-		echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET CPU_RATE_LIMIT 70;\""
-                psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET CPU_RATE_LIMIT 70;"
+        	echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET MEMORY_LIMIT $rg6_memory_limit;\""
+        	psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET MEMORY_LIMIT $rg6_memory_limit;"
+		echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET MEMORY_SHARED_QUOTA $rg6_memory_shared_quota;\""
+        	psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET MEMORY_SHARED_QUOTA $rg6_memory_shared_quota;"
+		echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET CONCURRENCY $rg6_concurrency;\""
+                psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET CONCURRENCY $rg6_concurrency;"
+		echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET CPU_RATE_LIMIT $rg6_cpu_rate_limit;\""
+                psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET CPU_RATE_LIMIT $rg6_cpu_rate_limit;"
 
 	elif [[ "$VERSION" == "gpdb_7" ]]; then
-        	echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET MEMORY_LIMIT 80;\""
-        	psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET MEMORY_LIMIT 80;"
-		echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group and default_group SET CPU_HARD_QUOTA_LIMIT 90;\""
-		psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET CPU_HARD_QUOTA_LIMIT 90;"
-		psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP default_group SET CPU_HARD_QUOTA_LIMIT 90;"
-                echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET CONCURRENCY 100;\""
-                psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET CONCURRENCY 100;"
-                echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET CPU_RATE_LIMIT 70;\""
-                psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET CPU_RATE_LIMIT 70;"
+        	echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET MEMORY_LIMIT $rg6_memory_limit;\""
+        	psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET MEMORY_LIMIT $rg6_memory_limit;"
+		echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group and default_group SET CPU_HARD_QUOTA_LIMIT $rg7_cpu_hard_quota_limit;\""
+		psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET CPU_HARD_QUOTA_LIMIT $rg7_cpu_hard_quota_limit;"
+		psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP default_group SET CPU_HARD_QUOTA_LIMIT $rg7_cpu_hard_quota_limit;"
+                echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET CONCURRENCY $rg6_concurrency;\""
+                psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET CONCURRENCY $rg6_concurrency;"
+                echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET CPU_RATE_LIMIT $rg6_cpu_rate_limit;\""
+                psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET CPU_RATE_LIMIT $rg6_cpu_rate_limit;"
 
 	fi
 	set_workfile_limits 
+	set_net_core_mem
 fi
 set_search_path
 export PGUSER=luka
