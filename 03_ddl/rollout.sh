@@ -64,8 +64,13 @@ else
 	exit 1
 fi
 
-create_tables()
+get_psql_count()
+{
+        psql_count=$(ps -ef | grep psql | grep 03_ddl | grep -v grep | wc -l)
+}
 
+
+create_tables()
 {
 for i in $(ls $PWD/*.$filter.*.sql); do
 	id=$(echo $i | awk -F '.' '{print $1}')
@@ -89,8 +94,8 @@ for i in $(ls $PWD/*.$filter.*.sql); do
 		DISTRIBUTED_BY=""
 	fi
 
-	echo "psql -v ON_ERROR_STOP=1 -q -a -P pager=off -f $i -v SMALL_STORAGE=\"$SMALL_STORAGE\" -v MEDIUM_STORAGE=\"$MEDIUM_STORAGE\" -v LARGE_STORAGE=\"$LARGE_STORAGE\" -v DISTRIBUTED_BY=\"$DISTRIBUTED_BY\""
-	psql -v ON_ERROR_STOP=1 -q -a -P pager=off -f $i -v SMALL_STORAGE="$SMALL_STORAGE" -v MEDIUM_STORAGE="$MEDIUM_STORAGE" -v LARGE_STORAGE="$LARGE_STORAGE" -v DISTRIBUTED_BY="$DISTRIBUTED_BY" -v EVERY_WEB_RETURNS="$EVERY_WEB_RETURNS" -v EVERY_CATALOG_RETURNS="$EVERY_CATALOG_RETURNS" -v EVERY_STORE_SALES="$EVERY_STORE_SALES" -v EVERY_CATALOG_SALES="$EVERY_CATALOG_SALES" -v EVERY_WEB_SALES="$EVERY_WEB_SALES" -v EVERY_STORE_RETURNS="$EVERY_STORE_RETURNS" -v EVERY_INVENTORY="$EVERY_INVENTORY" -v SCHEMA=$1
+	#echo "psql -v ON_ERROR_STOP=1 -q -P pager=off -f $i -v SMALL_STORAGE=\"$SMALL_STORAGE\" -v MEDIUM_STORAGE=\"$MEDIUM_STORAGE\" -v LARGE_STORAGE=\"$LARGE_STORAGE\" -v DISTRIBUTED_BY=\"$DISTRIBUTED_BY\""
+	PGOPTIONS='--client-min-messages=warning' psql -v ON_ERROR_STOP=1 -q -P pager=off -f $i -v SMALL_STORAGE="$SMALL_STORAGE" -v MEDIUM_STORAGE="$MEDIUM_STORAGE" -v LARGE_STORAGE="$LARGE_STORAGE" -v DISTRIBUTED_BY="$DISTRIBUTED_BY" -v EVERY_WEB_RETURNS="$EVERY_WEB_RETURNS" -v EVERY_CATALOG_RETURNS="$EVERY_CATALOG_RETURNS" -v EVERY_STORE_SALES="$EVERY_STORE_SALES" -v EVERY_CATALOG_SALES="$EVERY_CATALOG_SALES" -v EVERY_WEB_SALES="$EVERY_WEB_SALES" -v EVERY_STORE_RETURNS="$EVERY_STORE_RETURNS" -v EVERY_INVENTORY="$EVERY_INVENTORY" -v SCHEMA=$1
 	log
 done
 }
@@ -101,9 +106,21 @@ create_tables "tpcds"
 echo "Creating DDL for extra schemas TPCDSx"
 for i in $(seq 1 $EXTRA_TPCDS_QUERIES); do
         schema="tpcds$i"
-	echo "Creating DDL for schema $schema"
+	echo "Running stream$i for Creating DDL for schema $schema"
+	echo "Now executing DDLs. This make take a while..."
         create_tables "$schema" &
 done
+
+sleep 10
+
+get_psql_count
+while [ "$psql_count" -gt "0" ]; do
+	echo -ne "."
+        sleep 10
+        get_psql_count
+done
+echo "done."
+echo ""
 
 #external tables are the same for all gpdb
 if [ "$filter" == "gpdb" ]; then
@@ -152,8 +169,8 @@ if [ "$filter" == "gpdb" ]; then
 		fi
 		LOCATION+="'"
 
-		echo "psql -v ON_ERROR_STOP=1 -q -a -P pager=off -f $i -v LOCATION=\"$LOCATION\""
-		psql -v ON_ERROR_STOP=1 -q -a -P pager=off -f $i -v LOCATION="$LOCATION" 
+		#echo "psql -v ON_ERROR_STOP=1 -q -a -P pager=off -f $i -v LOCATION=\"$LOCATION\""
+		PGOPTIONS='--client-min-messages=warning' psql -v ON_ERROR_STOP=1 -q -P pager=off -f $i -v LOCATION="$LOCATION" 
 
 		log
 	done
