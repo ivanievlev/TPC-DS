@@ -119,9 +119,15 @@ set_search_path()
 	echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER USER $USER SET search_path=$schema_name,public;\""
 	psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER USER $USER SET search_path=$schema_name,public;"
 }
+
+set_adcc_superuser()
+{
+        echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"alter role adcc superuser\""
+        psql -v ON_ERROR_STOP=1 -q -A -t -c "alter role adcc superuser;"
+}
+
+
 #luka added set memory_limit and memory_shared_quota because with EVERY=1 too much partitions caused Canceling query 020.gpdb.web_returns.sql because of high VMEM usage
-
-
 set_workfile_limits()
 {
 	echo "gpconfig -c gp_workfile_limit_per_query -v 0"
@@ -177,6 +183,7 @@ if [[ "$VERSION" == *"gpdb"* ]]; then
 	set_net_core_mem
 fi
 set_search_path
+set_adcc_superuser
 export PGUSER=luka
 log
 
