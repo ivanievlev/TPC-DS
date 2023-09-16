@@ -12,6 +12,11 @@ MULTI_USER_COUNT=$4
 SINGLE_USER_ITERATIONS=$5
 EXCLUDE_HEAVY_QUERIES=$7
 SQL_ON_ERROR_STOP=${10}
+DELETE_DAT_FILES_BEFORE_SQL="${18}"
+ANALYZEDB_BEFORE_SQL="${19}"
+REFERENCE_TABLE_TYPE="${20}"
+DROP_CACHE_BEFORE_EACH_SINGLE_QUERY="${21}"
+USE_VMWARE_RECOMMENDED_SYSCTL_CONF="${22}"
 
 if [[ "$GEN_DATA_SCALE" == "" || "$EXPLAIN_ANALYZE" == "" || "$RANDOM_DISTRIBUTION" == "" || "$MULTI_USER_COUNT" == "" || "$SINGLE_USER_ITERATIONS" == "" ]]; then
 	echo "You must provide the scale as a parameter in terms of Gigabytes, true/false to run queries with EXPLAIN ANALYZE option, true/false to use random distrbution, multi-user count, and the number of sql iterations."
@@ -28,6 +33,11 @@ if [ "$SQL_ON_ERROR_STOP" == "true" ]; then
 else
 	ON_ERROR_STOP=0
 fi	
+
+echo "DELETE_DAT_FILES_BEFORE_SQL: $DELETE_DAT_FILES_BEFORE_SQL"
+if [ "$DELETE_DAT_FILES_BEFORE_SQL" == "true" ]; then
+        gpssh -f /home/gpadmin/arenadata_configs/arenadata_segment_hosts.hosts -e 'rm -Rf /data1/primary/gpseg*/arenadata/*.dat'
+fi
 
 rm -f $PWD/../log/*single.explain_analyze.log
 for i in $(ls $PWD/*.tpcds.*.sql); do
@@ -94,13 +104,13 @@ for i in $(ls $PWD/*.tpcds.*.sql); do
 		table_name=`echo $i | awk -F '.' '{print $3}'`
 		start_log
 		if [ "$EXPLAIN_ANALYZE" == "false" ]; then
-			echo "psql -v ON_ERROR_STOP=$ON_ERROR_STOP -A -q -t -P pager=off -v EXPLAIN_ANALYZE=\"\" -f $i | wc -l"
-			tuples=$(psql -v ON_ERROR_STOP=$ON_ERROR_STOP -A -q -t -P pager=off -v EXPLAIN_ANALYZE="" -f $i | wc -l; exit ${PIPESTATUS[0]})
+			echo "psql -d gpadmin -U luka -v ON_ERROR_STOP=$ON_ERROR_STOP -A -q -t -P pager=off -v EXPLAIN_ANALYZE=\"\" -f $i | wc -l"
+			tuples=$(psql -d gpadmin -U luka -v ON_ERROR_STOP=$ON_ERROR_STOP -A -q -t -P pager=off -v EXPLAIN_ANALYZE="" -f $i | wc -l; exit ${PIPESTATUS[0]})
 		else
 			myfilename=$(basename $i)
 			mylogfile=$PWD/../log/$myfilename.single.explain_analyze.log
-			echo "psql -v ON_ERROR_STOP=$ON_ERROR_STOP -A -q -t -P pager=off -v EXPLAIN_ANALYZE=\"EXPLAIN ANALYZE\" -f $i > $mylogfile"
-			psql -v ON_ERROR_STOP=$ON_ERROR_STOP -A -q -t -P pager=off -v EXPLAIN_ANALYZE="EXPLAIN ANALYZE" -f $i > $mylogfile
+			echo "psql -d gpadmin -U luka -v ON_ERROR_STOP=$ON_ERROR_STOP -A -q -t -P pager=off -v EXPLAIN_ANALYZE=\"EXPLAIN ANALYZE\" -f $i > $mylogfile"
+			psql -d gpadmin -U luka -v ON_ERROR_STOP=$ON_ERROR_STOP -A -q -t -P pager=off -v EXPLAIN_ANALYZE="EXPLAIN ANALYZE" -f $i > $mylogfile
 			tuples="0"
 		fi
 		log $tuples
