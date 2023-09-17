@@ -38,7 +38,7 @@ source_bashrc()
 		# don't fail if an error is happening in the admin's profile
 		source ~/.bashrc || true
 	fi
-	count=$(grep -v "^#" ~/.bashrc | grep "greenplum_path" | wc -l)
+	count=$(grep -v "^#" ~/.bashrc ~/.profile | grep "greenplum_path" | wc -l)
 	if [ "$count" -eq "0" ]; then
 		get_version
 		if [[ "$VERSION" == *"gpdb"* ]]; then
