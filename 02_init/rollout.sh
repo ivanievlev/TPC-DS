@@ -122,6 +122,9 @@ set_search_path()
 
 set_adcc_superuser()
 {
+        echo "psql -v ON_ERROR_STOP=0 -q -A -t -c \"create role adcc\""
+        psql -v ON_ERROR_STOP=0 -q -A -t -c "create role adcc;"
+
         echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"alter role adcc superuser\""
         psql -v ON_ERROR_STOP=1 -q -A -t -c "alter role adcc superuser;"
 }
