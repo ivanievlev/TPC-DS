@@ -13,7 +13,7 @@ SINGLE_USER_ITERATIONS=$5
 PARTITION_EVERY_FACTOR=$6
 EXTRA_TPCDS_QUERIES=$8
 
-#luka multiplying qiantity of partitions with EVERY=1 parameter in DDL
+#multiplying qiantity of partitions with EVERY=1 parameter in DDL
 #EVERY_WEB_RETURNS is used for web_returns, it is by default "180" in a classic TPC-DS RunningJon
 
 EVERY_WEB_RETURNS=$((180/$PARTITION_EVERY_FACTOR))

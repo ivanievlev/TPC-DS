@@ -205,9 +205,9 @@ check_variables()
                 new_variable=$(($new_variable + 1))
         fi
 
-        local count=$(grep "ANALYZEDB_BEFORE_SQL" $MYVAR | wc -l)
+        local count=$(grep "RUN_SQL_FROM_ROLE" $MYVAR | wc -l)
         if [ "$count" -eq "0" ]; then
-                echo "ANALYZEDB_BEFORE_SQL=\"false\"" >> $MYVAR
+                echo "RUN_SQL_FROM_ROLE=\"gpadmin\"" >> $MYVAR
                 new_variable=$(($new_variable + 1))
         fi
 
@@ -390,7 +390,7 @@ echo_variables()
 	echo "rg6_cpu_rate_limit: $rg6_cpu_rate_limit"
 	echo "rg7_cpu_hard_quota_limit: $rg7_cpu_hard_quota_limit"
 	echo "DELETE_DAT_FILES_BEFORE_SQL: $DELETE_DAT_FILES_BEFORE_SQL"
-	echo "ANALYZEDB_BEFORE_SQL: $ANALYZEDB_BEFORE_SQL"
+	echo "RUN_SQL_FROM_ROLE: $RUN_SQL_FROM_ROLE"
 	echo "REFERENCE_TABLE_TYPE: $REFERENCE_TABLE_TYPE"
 	echo "DROP_CACHE_BEFORE_EACH_SINGLE_QUERY: $DROP_CACHE_BEFORE_EACH_SINGLE_QUERY"
 	echo "USE_VMWARE_RECOMMENDED_SYSCTL_CONF: $USE_VMWARE_RECOMMENDED_SYSCTL_CONF"
@@ -409,4 +409,4 @@ yum_installs
 script_check
 echo_variables
 
-su -l $ADMIN_USER -c "cd \"$INSTALL_DIR/$REPO\"; ./rollout.sh $GEN_DATA_SCALE $EXPLAIN_ANALYZE $RANDOM_DISTRIBUTION $MULTI_USER_COUNT $RUN_COMPILE_TPCDS $RUN_GEN_DATA $RUN_INIT $RUN_DDL $RUN_LOAD $RUN_SQL $RUN_SINGLE_USER_REPORT $RUN_MULTI_USER $RUN_MULTI_USER_REPORT $RUN_SCORE $SINGLE_USER_ITERATIONS $PARTITION_EVERY_FACTOR $EXCLUDE_HEAVY_QUERIES $EXTRA_TPCDS_SCHEMAS $TRUNCATE_BEFORE_LOAD $SQL_ON_ERROR_STOP $net_core_rmem $net_core_wmem $rg6_memory_limit $rg6_memory_shared_quota $rg6_concurrency $rg6_cpu_rate_limit $rg7_cpu_hard_quota_limit $DELETE_DAT_FILES_BEFORE_SQL $ANALYZEDB_BEFORE_SQL $REFERENCE_TABLE_TYPE $DROP_CACHE_BEFORE_EACH_SINGLE_QUERY $USE_VMWARE_RECOMMENDED_SYSCTL_CONF"
+su -l $ADMIN_USER -c "cd \"$INSTALL_DIR/$REPO\"; ./rollout.sh $GEN_DATA_SCALE $EXPLAIN_ANALYZE $RANDOM_DISTRIBUTION $MULTI_USER_COUNT $RUN_COMPILE_TPCDS $RUN_GEN_DATA $RUN_INIT $RUN_DDL $RUN_LOAD $RUN_SQL $RUN_SINGLE_USER_REPORT $RUN_MULTI_USER $RUN_MULTI_USER_REPORT $RUN_SCORE $SINGLE_USER_ITERATIONS $PARTITION_EVERY_FACTOR $EXCLUDE_HEAVY_QUERIES $EXTRA_TPCDS_SCHEMAS $TRUNCATE_BEFORE_LOAD $SQL_ON_ERROR_STOP $net_core_rmem $net_core_wmem $rg6_memory_limit $rg6_memory_shared_quota $rg6_concurrency $rg6_cpu_rate_limit $rg7_cpu_hard_quota_limit $DELETE_DAT_FILES_BEFORE_SQL $RUN_SQL_FROM_ROLE $REFERENCE_TABLE_TYPE $DROP_CACHE_BEFORE_EACH_SINGLE_QUERY $USE_VMWARE_RECOMMENDED_SYSCTL_CONF"

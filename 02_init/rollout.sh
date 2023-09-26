@@ -12,6 +12,7 @@ rg6_memory_shared_quota=${14}
 rg6_concurrency=${15}
 rg6_cpu_rate_limit=${16}
 rg7_cpu_hard_quota_limit=${17}
+RUN_SQL_FROM_ROLE=${19}
 
 step=init
 init_log $step
@@ -122,15 +123,42 @@ set_search_path()
 
 set_adcc_superuser()
 {
-        echo "psql -v ON_ERROR_STOP=0 -q -A -t -c \"create role adcc\""
-        psql -v ON_ERROR_STOP=0 -q -A -t -c "create role adcc;"
+	IS_ROLE_EXIST=$(psql -d postgres -v ON_ERROR_STOP=1 -q -A -t -c "select count(*) from pg_roles where rolname = 'adcc'")
+	echo "IS_ROLE_EXIST = $IS_ROLE_EXIST"
 
-        echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"alter role adcc superuser\""
+	if [[ "$IS_ROLE_EXIST" == "0" ]]; then
+
+        	echo "psql -v ON_ERROR_STOP=0 -q -A -t -c \"create role adcc\""
+        	psql -v ON_ERROR_STOP=0 -q -A -t -c "create role adcc;"
+	fi
+        
+	echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"alter role adcc superuser\""
         psql -v ON_ERROR_STOP=1 -q -A -t -c "alter role adcc superuser;"
 }
 
 
-#luka added set memory_limit and memory_shared_quota because with EVERY=1 too much partitions caused Canceling query 020.gpdb.web_returns.sql because of high VMEM usage
+create_run_sql_from_role()
+{
+        IS_ROLE_EXIST=$(psql -d postgres -v ON_ERROR_STOP=1 -q -A -t -c "select count(*) from pg_roles where rolname = '$RUN_SQL_FROM_ROLE'")
+        echo "IS_ROLE_EXIST = $IS_ROLE_EXIST"
+
+        if [[ "$IS_ROLE_EXIST" == "0" ]]; then
+
+                echo "psql -v ON_ERROR_STOP=0 -q -A -t -c \"create role $RUN_SQL_FROM_ROLE SUPERUSER login\""
+                psql -v ON_ERROR_STOP=0 -q -A -t -c "create role $RUN_SQL_FROM_ROLE SUPERUSER login;"
+                echo "psql -v ON_ERROR_STOP=0 -q -A -t -c \"grant usage on schema tpcds $RUN_SQL_FROM_ROLE\""
+                psql -v ON_ERROR_STOP=0 -q -A -t -c "grant usage on schema tpcds to $RUN_SQL_FROM_ROLE;"
+                echo "psql -v ON_ERROR_STOP=0 -q -A -t -c \"alter role $RUN_SQL_FROM_ROLE IN DATABASE gpadmin SET search_path TO tpcds\""
+                psql -v ON_ERROR_STOP=0 -q -A -t -c "alter role $RUN_SQL_FROM_ROLE IN DATABASE gpadmin SET search_path TO tpcds;"
+
+
+	fi
+
+}
+
+
+
+#added set memory_limit and memory_shared_quota because with EVERY=1 too much partitions caused Canceling query 020.gpdb.web_returns.sql because of high VMEM usage
 set_workfile_limits()
 {
 	echo "gpconfig -c gp_workfile_limit_per_query -v 0"
@@ -187,7 +215,8 @@ if [[ "$VERSION" == *"gpdb"* ]]; then
 fi
 set_search_path
 set_adcc_superuser
-export PGUSER=luka
+create_run_sql_from_role
+export PGUSER=$RUN_SQL_FROM_ROLE
 log
 
 end_step $step

@@ -13,7 +13,7 @@ SINGLE_USER_ITERATIONS=$5
 EXCLUDE_HEAVY_QUERIES=$7
 SQL_ON_ERROR_STOP=${10}
 DELETE_DAT_FILES_BEFORE_SQL="${18}"
-ANALYZEDB_BEFORE_SQL="${19}"
+RUN_SQL_FROM_ROLE="${19}"
 REFERENCE_TABLE_TYPE="${20}"
 DROP_CACHE_BEFORE_EACH_SINGLE_QUERY="${21}"
 USE_VMWARE_RECOMMENDED_SYSCTL_CONF="${22}"
@@ -104,13 +104,13 @@ for i in $(ls $PWD/*.tpcds.*.sql); do
 		table_name=`echo $i | awk -F '.' '{print $3}'`
 		start_log
 		if [ "$EXPLAIN_ANALYZE" == "false" ]; then
-			echo "psql -d gpadmin -U luka -v ON_ERROR_STOP=$ON_ERROR_STOP -A -q -t -P pager=off -v EXPLAIN_ANALYZE=\"\" -f $i | wc -l"
-			tuples=$(psql -d gpadmin -U luka -v ON_ERROR_STOP=$ON_ERROR_STOP -A -q -t -P pager=off -v EXPLAIN_ANALYZE="" -f $i | wc -l; exit ${PIPESTATUS[0]})
+			echo "psql -d gpadmin -U $RUN_SQL_FROM_ROLE -v ON_ERROR_STOP=$ON_ERROR_STOP -A -q -t -P pager=off -v EXPLAIN_ANALYZE=\"\" -f $i | wc -l"
+			tuples=$(psql -d gpadmin -U $RUN_SQL_FROM_ROLE -v ON_ERROR_STOP=$ON_ERROR_STOP -A -q -t -P pager=off -v EXPLAIN_ANALYZE="" -f $i | wc -l; exit ${PIPESTATUS[0]})
 		else
 			myfilename=$(basename $i)
 			mylogfile=$PWD/../log/$myfilename.single.explain_analyze.log
-			echo "psql -d gpadmin -U luka -v ON_ERROR_STOP=$ON_ERROR_STOP -A -q -t -P pager=off -v EXPLAIN_ANALYZE=\"EXPLAIN ANALYZE\" -f $i > $mylogfile"
-			psql -d gpadmin -U luka -v ON_ERROR_STOP=$ON_ERROR_STOP -A -q -t -P pager=off -v EXPLAIN_ANALYZE="EXPLAIN ANALYZE" -f $i > $mylogfile
+			echo "psql -d gpadmin -U $RUN_SQL_FROM_ROLE -v ON_ERROR_STOP=$ON_ERROR_STOP -A -q -t -P pager=off -v EXPLAIN_ANALYZE=\"EXPLAIN ANALYZE\" -f $i > $mylogfile"
+			psql -d gpadmin -U $RUN_SQL_FROM_ROLE -v ON_ERROR_STOP=$ON_ERROR_STOP -A -q -t -P pager=off -v EXPLAIN_ANALYZE="EXPLAIN ANALYZE" -f $i > $mylogfile
 			tuples="0"
 		fi
 		log $tuples
