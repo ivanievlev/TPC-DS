@@ -146,8 +146,8 @@ create_run_sql_from_role()
 
                 echo "psql -v ON_ERROR_STOP=0 -q -A -t -c \"create role $RUN_SQL_FROM_ROLE SUPERUSER login\""
                 psql -v ON_ERROR_STOP=0 -q -A -t -c "create role $RUN_SQL_FROM_ROLE SUPERUSER login;"
-                echo "psql -v ON_ERROR_STOP=0 -q -A -t -c \"grant usage on schema tpcds $RUN_SQL_FROM_ROLE\""
-                psql -v ON_ERROR_STOP=0 -q -A -t -c "grant usage on schema tpcds to $RUN_SQL_FROM_ROLE;"
+                #echo "psql -v ON_ERROR_STOP=0 -q -A -t -c \"grant usage on schema to tpcds $RUN_SQL_FROM_ROLE\""
+                #psql -v ON_ERROR_STOP=0 -q -A -t -c "grant usage on schema tpcds to $RUN_SQL_FROM_ROLE;"
                 echo "psql -v ON_ERROR_STOP=0 -q -A -t -c \"alter role $RUN_SQL_FROM_ROLE IN DATABASE gpadmin SET search_path TO tpcds\""
                 psql -v ON_ERROR_STOP=0 -q -A -t -c "alter role $RUN_SQL_FROM_ROLE IN DATABASE gpadmin SET search_path TO tpcds;"
 
