@@ -220,8 +220,8 @@ if [[ "$VERSION" == *"gpdb"* ]]; then
 		psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP default_group SET CPU_HARD_QUOTA_LIMIT $rg7_cpu_hard_quota_limit;"
                 echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET CONCURRENCY $rg6_concurrency;\""
                 psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET CONCURRENCY $rg6_concurrency;"
-                echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET CPU_RATE_LIMIT $rg6_cpu_rate_limit;\""
-                psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET CPU_RATE_LIMIT $rg6_cpu_rate_limit;"
+                #echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET CPU_RATE_LIMIT $rg6_cpu_rate_limit;\""
+                #psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET CPU_RATE_LIMIT $rg6_cpu_rate_limit;"
 
 	fi
 	set_workfile_limits 
