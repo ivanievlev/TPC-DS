@@ -37,6 +37,7 @@ RUN_SQL_FROM_ROLE="${29}"
 REFERENCE_TABLE_TYPE="${30}"
 DROP_CACHE_BEFORE_EACH_SINGLE_QUERY="${31}"
 USE_VMWARE_RECOMMENDED_SYSCTL_CONF="${32}"
+ADMIN_USER="${33}"
 
 if [[ "$GEN_DATA_SCALE" == "" || "$EXPLAIN_ANALYZE" == "" || "$RANDOM_DISTRIBUTION" == "" || "$MULTI_USER_COUNT" == "" || "$RUN_COMPILE_TPCDS" == "" || "$RUN_GEN_DATA" == "" || "$RUN_INIT" == "" || "$RUN_DDL" == "" || "$RUN_LOAD" == "" || "$RUN_SQL" == "" || "$RUN_SINGLE_USER_REPORT" == "" || "$RUN_MULTI_USER" == "" || "$RUN_MULTI_USER_REPORT" == "" || "$RUN_SCORE" == "" || "$SINGLE_USER_ITERATIONS" == "" ]]; then
 	echo "Please run this script from tpcds.sh so the correct parameters are passed to it."
@@ -90,6 +91,7 @@ echo "RUN_SQL_FROM_ROLE: $RUN_SQL_FROM_ROLE"
 echo "REFERENCE_TABLE_TYPE: $REFERENCE_TABLE_TYPE"
 echo "DROP_CACHE_BEFORE_EACH_SINGLE_QUERY: $DROP_CACHE_BEFORE_EACH_SINGLE_QUERY"
 echo "USE_VMWARE_RECOMMENDED_SYSCTL_CONF: $USE_VMWARE_RECOMMENDED_SYSCTL_CONF"
+echo "ADMIN_USER: $ADMIN_USER"
 
 echo "############################################################################"
 echo ""
@@ -130,5 +132,5 @@ fi
 
 for i in $(ls -d $PWD/0*); do
 	echo "$i/rollout.sh"
-	$i/rollout.sh $GEN_DATA_SCALE $EXPLAIN_ANALYZE $RANDOM_DISTRIBUTION $MULTI_USER_COUNT $SINGLE_USER_ITERATIONS $PARTITION_EVERY_FACTOR $EXCLUDE_HEAVY_QUERIES $EXTRA_TPCDS_SCHEMAS $TRUNCATE_BEFORE_LOAD $SQL_ON_ERROR_STOP $net_core_rmem $net_core_wmem $rg6_memory_limit $rg6_memory_shared_quota $rg6_concurrency $rg6_cpu_rate_limit $rg7_cpu_hard_quota_limit $DELETE_DAT_FILES_BEFORE_SQL $RUN_SQL_FROM_ROLE $DROP_CACHE_BEFORE_EACH_SINGLE_QUERY $USE_VMWARE_RECOMMENDED_SYSCTL_CONF
+	$i/rollout.sh $GEN_DATA_SCALE $EXPLAIN_ANALYZE $RANDOM_DISTRIBUTION $MULTI_USER_COUNT $SINGLE_USER_ITERATIONS $PARTITION_EVERY_FACTOR $EXCLUDE_HEAVY_QUERIES $EXTRA_TPCDS_SCHEMAS $TRUNCATE_BEFORE_LOAD $SQL_ON_ERROR_STOP $net_core_rmem $net_core_wmem $rg6_memory_limit $rg6_memory_shared_quota $rg6_concurrency $rg6_cpu_rate_limit $rg7_cpu_hard_quota_limit $DELETE_DAT_FILES_BEFORE_SQL $RUN_SQL_FROM_ROLE $DROP_CACHE_BEFORE_EACH_SINGLE_QUERY $USE_VMWARE_RECOMMENDED_SYSCTL_CONF $ADMIN_USER
 done

@@ -398,6 +398,34 @@ echo_variables()
 	echo ""
 }
 
+run_before_rollout()
+{
+	echo "Stopping crond..."
+	systemctl stop crond
+	
+	echo "Setting mtu 9000 on all hosts..."
+	su -l $ADMIN_USER -c "gpssh -f /home/gpadmin/arenadata_configs/arenadata_all_hosts.hosts -v -e 'sudo ip link set mtu 9000 dev eth0'"
+
+	echo "Checking if cluster is started..."
+	IS_CLUSTER_STARTED=$(su -l "$ADMIN_USER" -c "gpstate -e | grep 'All segments are running normally'" | wc -l)
+        echo "IS_CLUSTER_STARTED = $IS_CLUSTER_STARTED"
+
+        if [[ "$IS_CLUSTER_STARTED" == "0" ]]; then
+
+                echo "Cluster is stopped. Starting the cluster..."
+		echo "gpstart -a"
+                su -l $ADMIN_USER -c "gpstart -a"
+        fi
+
+}
+
+run_after_rollout()
+{
+	echo "Starting crond..."
+	systemctl start crond
+}
+
+
 ##################################################################################################################################################
 # Body
 ##################################################################################################################################################
@@ -408,5 +436,8 @@ yum_installs
 #repo_init
 script_check
 echo_variables
+run_before_rollout
 
-su -l $ADMIN_USER -c "cd \"$INSTALL_DIR/$REPO\"; ./rollout.sh $GEN_DATA_SCALE $EXPLAIN_ANALYZE $RANDOM_DISTRIBUTION $MULTI_USER_COUNT $RUN_COMPILE_TPCDS $RUN_GEN_DATA $RUN_INIT $RUN_DDL $RUN_LOAD $RUN_SQL $RUN_SINGLE_USER_REPORT $RUN_MULTI_USER $RUN_MULTI_USER_REPORT $RUN_SCORE $SINGLE_USER_ITERATIONS $PARTITION_EVERY_FACTOR $EXCLUDE_HEAVY_QUERIES $EXTRA_TPCDS_SCHEMAS $TRUNCATE_BEFORE_LOAD $SQL_ON_ERROR_STOP $net_core_rmem $net_core_wmem $rg6_memory_limit $rg6_memory_shared_quota $rg6_concurrency $rg6_cpu_rate_limit $rg7_cpu_hard_quota_limit $DELETE_DAT_FILES_BEFORE_SQL $RUN_SQL_FROM_ROLE $REFERENCE_TABLE_TYPE $DROP_CACHE_BEFORE_EACH_SINGLE_QUERY $USE_VMWARE_RECOMMENDED_SYSCTL_CONF"
+su -l $ADMIN_USER -c "cd \"$INSTALL_DIR/$REPO\"; ./rollout.sh $GEN_DATA_SCALE $EXPLAIN_ANALYZE $RANDOM_DISTRIBUTION $MULTI_USER_COUNT $RUN_COMPILE_TPCDS $RUN_GEN_DATA $RUN_INIT $RUN_DDL $RUN_LOAD $RUN_SQL $RUN_SINGLE_USER_REPORT $RUN_MULTI_USER $RUN_MULTI_USER_REPORT $RUN_SCORE $SINGLE_USER_ITERATIONS $PARTITION_EVERY_FACTOR $EXCLUDE_HEAVY_QUERIES $EXTRA_TPCDS_SCHEMAS $TRUNCATE_BEFORE_LOAD $SQL_ON_ERROR_STOP $net_core_rmem $net_core_wmem $rg6_memory_limit $rg6_memory_shared_quota $rg6_concurrency $rg6_cpu_rate_limit $rg7_cpu_hard_quota_limit $DELETE_DAT_FILES_BEFORE_SQL $RUN_SQL_FROM_ROLE $REFERENCE_TABLE_TYPE $DROP_CACHE_BEFORE_EACH_SINGLE_QUERY $USE_VMWARE_RECOMMENDED_SYSCTL_CONF $ADMIN_USER"
+
+run_after_rollout

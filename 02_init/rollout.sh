@@ -13,6 +13,7 @@ rg6_concurrency=${15}
 rg6_cpu_rate_limit=${16}
 rg7_cpu_hard_quota_limit=${17}
 RUN_SQL_FROM_ROLE=${19}
+ADMIN_USER=${22}
 
 step=init
 init_log $step
@@ -148,11 +149,24 @@ create_run_sql_from_role()
                 psql -v ON_ERROR_STOP=0 -q -A -t -c "create role $RUN_SQL_FROM_ROLE SUPERUSER login;"
                 #echo "psql -v ON_ERROR_STOP=0 -q -A -t -c \"grant usage on schema to tpcds $RUN_SQL_FROM_ROLE\""
                 #psql -v ON_ERROR_STOP=0 -q -A -t -c "grant usage on schema tpcds to $RUN_SQL_FROM_ROLE;"
-                echo "psql -v ON_ERROR_STOP=0 -q -A -t -c \"alter role $RUN_SQL_FROM_ROLE IN DATABASE gpadmin SET search_path TO tpcds\""
-                psql -v ON_ERROR_STOP=0 -q -A -t -c "alter role $RUN_SQL_FROM_ROLE IN DATABASE gpadmin SET search_path TO tpcds;"
+                echo "psql -v ON_ERROR_STOP=0 -q -A -t -c \"alter role $RUN_SQL_FROM_ROLE IN DATABASE $ADMIN_USER SET search_path TO tpcds\""
+                psql -v ON_ERROR_STOP=0 -q -A -t -c "alter role $RUN_SQL_FROM_ROLE IN DATABASE $ADMIN_USER SET search_path TO tpcds;"
 
 
 	fi
+
+        echo "Checking if sql users have access to cluster..."
+	echo "ADMIN_USER = $ADMIN_USER"
+        HAS_ACCESS=$(psql -d "$ADMIN_USER" -U "$RUN_SQL_FROM_ROLE" -v ON_ERROR_STOP=1 -q -A -t -c 'select 1' | wc -l)
+        echo "HAS_ACCESS = $HAS_ACCESS"
+
+        if [[ "$HAS_ACCESS" == "0" ]]; then
+
+                echo "User has no access. Adding line to pg_hba..."
+                echo "local all all trust" >> /data1/master/gpseg-1/pg_hba.conf
+                gpstop -u
+        fi
+
 
 }
 
