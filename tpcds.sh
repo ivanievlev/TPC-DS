@@ -400,8 +400,8 @@ echo_variables()
 
 run_before_rollout()
 {
-	echo "Stopping crond..."
-	systemctl stop crond
+	#echo "Stopping crond..."
+	#systemctl stop crond
 	
 	echo "Setting mtu 9000 on all hosts..."
 	su -l $ADMIN_USER -c "gpssh -f /home/gpadmin/arenadata_configs/arenadata_all_hosts.hosts -v -e 'sudo ip link set mtu 9000 dev eth0'"
@@ -421,8 +421,8 @@ run_before_rollout()
 
 run_after_rollout()
 {
-	echo "Starting crond..."
-	systemctl start crond
+	#echo "Starting crond..."
+	#systemctl start crond
 }
 
 
