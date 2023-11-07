@@ -423,6 +423,7 @@ run_after_rollout()
 {
 	#echo "Starting crond..."
 	#systemctl start crond
+	echo "Finish."
 }
 
 
