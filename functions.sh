@@ -10,11 +10,9 @@ if [ "$count" -gt "0" ]; then
 	unalias ls
 fi
 
-if [ -f /lib64/libz.so.1 ]; then
-	export LD_PRELOAD=/lib64/libz.so.1 ps
-else
-	echo "/lib64/libz.so.1 was not found and preloaded"
-fi
+#LD_PRELOAD=/lib64/libz.so.1 ps is optional and it caused problems on Astra Linux
+#export LD_PRELOAD=/lib64/libz.so.1 ps
+
 
 LOCAL_PWD=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 OSVERSION=`uname`
