@@ -41,6 +41,10 @@ source_bashrc()
 		source ~/.bashrc || true
 	fi
 
+        if [ -f ~/.bash_profile ]; then
+                source ~/.bash_profile || true
+        fi
+	
         if [ -f ~/.profile ]; then
                 # don't fail if an error is happening in the admin's profile
                 source ~/.profile || true
