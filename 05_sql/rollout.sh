@@ -39,6 +39,9 @@ if [ "$DELETE_DAT_FILES_BEFORE_SQL" == "true" ]; then
         gpssh -f /home/gpadmin/arenadata_configs/arenadata_segment_hosts.hosts -e 'rm -Rf /data1/primary/gpseg*/arenadata/*.dat'
 fi
 
+echo "Checking optimizer settings"
+gpconfig -s optimizer
+
 rm -f $PWD/../log/*single.explain_analyze.log
 for i in $(ls $PWD/*.tpcds.*.sql); do
 	qnum=`echo $i | awk -F '.' '{print $3}'`

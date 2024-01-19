@@ -14,6 +14,7 @@ rg6_cpu_rate_limit=${16}
 rg7_cpu_hard_quota_limit=${17}
 RUN_SQL_FROM_ROLE=${19}
 ADMIN_USER=${22}
+SET_OPTIMIZER=${25}
 
 step=init
 init_log $step
@@ -51,7 +52,7 @@ set_segment_bashrc()
 				count=$(ssh $ext_host "grep LD_PRELOAD ~/.bashrc" 2> /dev/null | wc -l)
 				if [ "$count" -eq "0" ]; then
 					echo "Adding LD_PRELOAD to $ext_host .bashrc"
-					ssh $ext_host "echo \"export LD_PRELOAD=/lib64/libz.so.1 ps\" >> ~/.bashrc"
+					#ssh $ext_host "echo \"export LD_PRELOAD=/lib64/libz.so.1 ps\" >> ~/.bashrc"
 				fi
 			fi
 		fi
@@ -187,6 +188,14 @@ set_workfile_limits()
         gpstop -aqrM fast
 }
 
+
+set_optimizer()
+{
+	echo "gpconfig -c optimizer -v $SET_OPTIMIZER --masteronly"
+	gpconfig -c optimizer -v $SET_OPTIMIZER --masteronly
+	gpstop -u
+}
+
 set_net_core_mem()
 {
 	echo "sysctl -w net.core.rmem_max=$net_core_rmem"
@@ -204,6 +213,8 @@ if [[ "$VERSION" == *"gpdb"* ]]; then
 	set_segment_bashrc
 	check_gucs
 	copy_config
+
+	
 	if [[ "$VERSION" == "gpdb_6" ]]; then
         	echo "psql -v ON_ERROR_STOP=1 -q -A -t -c \"ALTER RESOURCE GROUP admin_group SET MEMORY_LIMIT $rg6_memory_limit;\""
         	psql -v ON_ERROR_STOP=1 -q -A -t -c "ALTER RESOURCE GROUP admin_group SET MEMORY_LIMIT $rg6_memory_limit;"
@@ -231,6 +242,7 @@ if [[ "$VERSION" == *"gpdb"* ]]; then
 fi
 set_search_path
 set_adcc_superuser
+set_optimizer
 create_run_sql_from_role
 export PGUSER=$RUN_SQL_FROM_ROLE
 log

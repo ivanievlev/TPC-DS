@@ -228,6 +228,24 @@ check_variables()
                 echo "USE_VMWARE_RECOMMENDED_SYSCTL_CONF=\"false\"" >> $MYVAR
                 new_variable=$(($new_variable + 1))
         fi
+
+        local count=$(grep "MAKE_PREREQUISITES" $MYVAR | wc -l)
+        if [ "$count" -eq "0" ]; then
+                echo "MAKE_PREREQUISITES=\"false\"" >> $MYVAR
+                new_variable=$(($new_variable + 1))
+        fi
+
+        local count=$(grep "NETWORK_INTERFACE_JUMBOFRAME" $MYVAR | wc -l)
+        if [ "$count" -eq "0" ]; then
+                echo "NETWORK_INTERFACE_JUMBOFRAME=\"eth0\"" >> $MYVAR
+                new_variable=$(($new_variable + 1))
+        fi
+
+        local count=$(grep "SET_ORCA_OPTIMIZER" $MYVAR | wc -l)
+        if [ "$count" -eq "0" ]; then
+                echo "SET_ORCA_OPTIMIZER=\"on\"" >> $MYVAR
+                new_variable=$(($new_variable + 1))
+        fi
         
 
 	if [ "$new_variable" -gt "0" ]; then
@@ -394,17 +412,18 @@ echo_variables()
 	echo "REFERENCE_TABLE_TYPE: $REFERENCE_TABLE_TYPE"
 	echo "DROP_CACHE_BEFORE_EACH_SINGLE_QUERY: $DROP_CACHE_BEFORE_EACH_SINGLE_QUERY"
 	echo "USE_VMWARE_RECOMMENDED_SYSCTL_CONF: $USE_VMWARE_RECOMMENDED_SYSCTL_CONF"
+	echo "MAKE_PREREQUISITES: $MAKE_PREREQUISITES"
+	echo "NETWORK_INTERFACE_JUMBOFRAME: $NETWORK_INTERFACE_JUMBOFRAME"
+	echo "SET_ORCA_OPTIMIZER: $SET_ORCA_OPTIMIZER"
 	echo "############################################################################"
 	echo ""
 }
 
-run_before_rollout()
+make_prerequisites()
 {
-	#echo "Stopping crond..."
-	#systemctl stop crond
 	
 	echo "Setting mtu 9000 on all hosts..."
-	su -l $ADMIN_USER -c "gpssh -f /home/gpadmin/arenadata_configs/arenadata_all_hosts.hosts -v -e 'sudo ip link set mtu 9000 dev eth0'"
+	su -l $ADMIN_USER -c "gpssh -f /home/gpadmin/arenadata_configs/arenadata_all_hosts.hosts -v -e 'sudo ip link set mtu 9000 dev $NETWORK_INTERFACE_JUMBOFRAME'"
 
 	echo "Checking if cluster is started..."
 	IS_CLUSTER_STARTED=$(su -l "$ADMIN_USER" -c "gpstate -e | grep 'All segments are running normally'" | wc -l)
@@ -437,8 +456,13 @@ yum_installs
 #repo_init
 script_check
 echo_variables
-run_before_rollout
 
-su -l $ADMIN_USER -c "cd \"$INSTALL_DIR/$REPO\"; ./rollout.sh $GEN_DATA_SCALE $EXPLAIN_ANALYZE $RANDOM_DISTRIBUTION $MULTI_USER_COUNT $RUN_COMPILE_TPCDS $RUN_GEN_DATA $RUN_INIT $RUN_DDL $RUN_LOAD $RUN_SQL $RUN_SINGLE_USER_REPORT $RUN_MULTI_USER $RUN_MULTI_USER_REPORT $RUN_SCORE $SINGLE_USER_ITERATIONS $PARTITION_EVERY_FACTOR $EXCLUDE_HEAVY_QUERIES $EXTRA_TPCDS_SCHEMAS $TRUNCATE_BEFORE_LOAD $SQL_ON_ERROR_STOP $net_core_rmem $net_core_wmem $rg6_memory_limit $rg6_memory_shared_quota $rg6_concurrency $rg6_cpu_rate_limit $rg7_cpu_hard_quota_limit $DELETE_DAT_FILES_BEFORE_SQL $RUN_SQL_FROM_ROLE $REFERENCE_TABLE_TYPE $DROP_CACHE_BEFORE_EACH_SINGLE_QUERY $USE_VMWARE_RECOMMENDED_SYSCTL_CONF $ADMIN_USER"
+if [ "$MAKE_PREREQUISITES" == "TRUE" ]; then
+	echo "Running make_prerequisites step"
+        make_prerequisites
+fi
 
-run_after_rollout
+
+su -l $ADMIN_USER -c "cd \"$INSTALL_DIR/$REPO\"; ./rollout.sh $GEN_DATA_SCALE $EXPLAIN_ANALYZE $RANDOM_DISTRIBUTION $MULTI_USER_COUNT $RUN_COMPILE_TPCDS $RUN_GEN_DATA $RUN_INIT $RUN_DDL $RUN_LOAD $RUN_SQL $RUN_SINGLE_USER_REPORT $RUN_MULTI_USER $RUN_MULTI_USER_REPORT $RUN_SCORE $SINGLE_USER_ITERATIONS $PARTITION_EVERY_FACTOR $EXCLUDE_HEAVY_QUERIES $EXTRA_TPCDS_SCHEMAS $TRUNCATE_BEFORE_LOAD $SQL_ON_ERROR_STOP $net_core_rmem $net_core_wmem $rg6_memory_limit $rg6_memory_shared_quota $rg6_concurrency $rg6_cpu_rate_limit $rg7_cpu_hard_quota_limit $DELETE_DAT_FILES_BEFORE_SQL $RUN_SQL_FROM_ROLE $REFERENCE_TABLE_TYPE $DROP_CACHE_BEFORE_EACH_SINGLE_QUERY $USE_VMWARE_RECOMMENDED_SYSCTL_CONF $ADMIN_USER $MAKE_PREREQUISITES $NETWORK_INTERFACE_JUMBOFRAME $SET_ORCA_OPTIMIZER"
+
+
