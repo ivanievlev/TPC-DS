@@ -65,9 +65,23 @@ get_version()
 	#need to call source_bashrc first
 	VERSION=$(psql -v ON_ERROR_STOP=1 -t -A -c "SELECT CASE WHEN POSITION ('Greenplum Database 4.3' IN version) > 0 THEN 'gpdb_4_3' WHEN POSITION ('Greenplum Database 5' IN version) > 0 THEN 'gpdb_5' WHEN POSITION ('Greenplum Database 6' IN version) > 0 THEN 'gpdb_6' WHEN POSITION ('Greenplum Database 7' IN version) > 0 THEN 'gpdb_7' ELSE 'postgresql' END FROM version();") 
 	if [[ "$VERSION" == *"gpdb"* ]]; then
-		SMALL_STORAGE="appendonly=true, orientation=column"
+		if [ "${HEAP_ONLY}" == "true" ]; then
+    			HEAP_STORAGE="appendonly=false"
+			SMALL_STORAGE="${HEAP_STORAGE}"
+    			MEDIUM_STORAGE="${HEAP_STORAGE}"
+    			LARGE_STORAGE="${HEAP_STORAGE}"
+		else
+			if [ "${REFERENCE_TABLE_TYPE}" == "aoco" ]; then
+				SMALL_STORAGE="appendonly=true, orientation=column"
+			elif [ "${REFERENCE_TABLE_TYPE}" == "aoro" ]; then
+				SMALL_STORAGE="appendonly=true, orientation=row"
+			elif [ "${REFERENCE_TABLE_TYPE}" == "heap" ]; then
+				echo "checked luka"
+				SMALL_STORAGE="appendonly=false"
+			fi
 		MEDIUM_STORAGE="appendonly=true, orientation=column"
 		LARGE_STORAGE="appendonly=true, orientation=column, compresstype=zstd, compresslevel=5"
+		fi
 	else
 		SMALL_STORAGE=""
 		MEDIUM_STORAGE=""

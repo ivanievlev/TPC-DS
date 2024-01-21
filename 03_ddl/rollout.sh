@@ -12,6 +12,12 @@ MULTI_USER_COUNT=$4
 SINGLE_USER_ITERATIONS=$5
 PARTITION_EVERY_FACTOR=$6
 EXTRA_TPCDS_QUERIES=$8
+HEAP_ONLY=${21}
+REFERENCE_TABLE_TYPE=${26}
+
+echo "HEAP_ONLY: $HEAP_ONLY"
+echo "REFERENCE_TABLE_TYPE: $REFERENCE_TABLE_TYPE"
+
 
 #multiplying qiantity of partitions with EVERY=1 parameter in DDL
 #EVERY_WEB_RETURNS is used for web_returns, it is by default "180" in a classic TPC-DS RunningJon

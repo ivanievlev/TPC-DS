@@ -24,7 +24,7 @@ CREATE TABLE :SCHEMA.web_returns (
     wr_account_credit numeric(7,2),
     wr_net_loss numeric(7,2)
 )
-WITH (:SMALL_STORAGE)
+WITH (:MEDIUM_STORAGE)
 :DISTRIBUTED_BY
 partition by range(wr_returned_date_sk)
 (start(2450815) INCLUSIVE end(2453005) INCLUSIVE every (:EVERY_WEB_RETURNS),

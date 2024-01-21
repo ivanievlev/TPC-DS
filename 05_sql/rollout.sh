@@ -16,7 +16,6 @@ DELETE_DAT_FILES_BEFORE_SQL="${18}"
 RUN_SQL_FROM_ROLE="${19}"
 REFERENCE_TABLE_TYPE="${20}"
 DROP_CACHE_BEFORE_EACH_SINGLE_QUERY="${21}"
-USE_VMWARE_RECOMMENDED_SYSCTL_CONF="${22}"
 
 if [[ "$GEN_DATA_SCALE" == "" || "$EXPLAIN_ANALYZE" == "" || "$RANDOM_DISTRIBUTION" == "" || "$MULTI_USER_COUNT" == "" || "$SINGLE_USER_ITERATIONS" == "" ]]; then
 	echo "You must provide the scale as a parameter in terms of Gigabytes, true/false to run queries with EXPLAIN ANALYZE option, true/false to use random distrbution, multi-user count, and the number of sql iterations."
