@@ -210,7 +210,7 @@ set_net_core_mem()
 
 get_version
 if [[ "$VERSION" == *"gpdb"* ]]; then
-	set_segment_bashrc
+	#set_segment_bashrc
 	check_gucs
 	copy_config
 
