@@ -37,6 +37,11 @@ check_variables()
 		echo "ADMIN_USER=\"gpadmin\"" >> $MYVAR
 		new_variable=$(($new_variable + 1))
 	fi
+        local count=$(grep "DBNAME=" $MYVAR | wc -l)
+        if [ "$count" -eq "0" ]; then
+                echo "DBNAME=\"gp_tpcds\"" >> $MYVAR
+                new_variable=$(($new_variable + 1))
+        fi
 	local count=$(grep "INSTALL_DIR=" $MYVAR | wc -l)
 	if [ "$count" -eq "0" ]; then
 		echo "INSTALL_DIR=\"/arenadata\"" >> $MYVAR
@@ -393,6 +398,7 @@ echo_variables()
 	echo "REPO: $REPO"
 	echo "REPO_URL: $REPO_URL"
 	echo "ADMIN_USER: $ADMIN_USER"
+	echo "DBNAME: $DBNAME"
 	echo "INSTALL_DIR: $INSTALL_DIR"
 	echo "MULTI_USER_COUNT: $MULTI_USER_COUNT"
 	echo "PARTITION_EVERY_FACTOR: $PARTITION_EVERY_FACTOR"
@@ -457,12 +463,12 @@ yum_installs
 script_check
 echo_variables
 
-if [ "$MAKE_PREREQUISITES" == "TRUE" ]; then
+if [ "$MAKE_PREREQUISITES" == "true" ]; then
 	echo "Running make_prerequisites step"
         make_prerequisites
 fi
 
 
-su -l $ADMIN_USER -c "cd \"$INSTALL_DIR/$REPO\"; ./rollout.sh $GEN_DATA_SCALE $EXPLAIN_ANALYZE $RANDOM_DISTRIBUTION $MULTI_USER_COUNT $RUN_COMPILE_TPCDS $RUN_GEN_DATA $RUN_INIT $RUN_DDL $RUN_LOAD $RUN_SQL $RUN_SINGLE_USER_REPORT $RUN_MULTI_USER $RUN_MULTI_USER_REPORT $RUN_SCORE $SINGLE_USER_ITERATIONS $PARTITION_EVERY_FACTOR $EXCLUDE_HEAVY_QUERIES $EXTRA_TPCDS_SCHEMAS $TRUNCATE_BEFORE_LOAD $SQL_ON_ERROR_STOP $net_core_rmem $net_core_wmem $rg6_memory_limit $rg6_memory_shared_quota $rg6_concurrency $rg6_cpu_rate_limit $rg7_cpu_hard_quota_limit $DELETE_DAT_FILES_BEFORE_SQL $RUN_SQL_FROM_ROLE $REFERENCE_TABLE_TYPE $DROP_CACHE_BEFORE_EACH_SINGLE_QUERY $HEAP_ONLY $ADMIN_USER $MAKE_PREREQUISITES $NETWORK_INTERFACE_JUMBOFRAME $SET_ORCA_OPTIMIZER"
+su -l $ADMIN_USER -c "cd \"$INSTALL_DIR/$REPO\"; ./rollout.sh $GEN_DATA_SCALE $EXPLAIN_ANALYZE $RANDOM_DISTRIBUTION $MULTI_USER_COUNT $RUN_COMPILE_TPCDS $RUN_GEN_DATA $RUN_INIT $RUN_DDL $RUN_LOAD $RUN_SQL $RUN_SINGLE_USER_REPORT $RUN_MULTI_USER $RUN_MULTI_USER_REPORT $RUN_SCORE $SINGLE_USER_ITERATIONS $PARTITION_EVERY_FACTOR $EXCLUDE_HEAVY_QUERIES $EXTRA_TPCDS_SCHEMAS $TRUNCATE_BEFORE_LOAD $SQL_ON_ERROR_STOP $net_core_rmem $net_core_wmem $rg6_memory_limit $rg6_memory_shared_quota $rg6_concurrency $rg6_cpu_rate_limit $rg7_cpu_hard_quota_limit $DELETE_DAT_FILES_BEFORE_SQL $RUN_SQL_FROM_ROLE $REFERENCE_TABLE_TYPE $DROP_CACHE_BEFORE_EACH_SINGLE_QUERY $HEAP_ONLY $ADMIN_USER $MAKE_PREREQUISITES $NETWORK_INTERFACE_JUMBOFRAME $SET_ORCA_OPTIMIZER $DBNAME"
 
 

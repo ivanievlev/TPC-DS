@@ -10,6 +10,7 @@ EXPLAIN_ANALYZE=$2
 RANDOM_DISTRIBUTION=$3
 MULTI_USER_COUNT=$4
 SINGLE_USER_ITERATIONS=$5
+DBNAME=${27}
 
 if [[ "$GEN_DATA_SCALE" == "" || "$EXPLAIN_ANALYZE" == "" || "$RANDOM_DISTRIBUTION" == "" || "$MULTI_USER_COUNT" == "" || "$SINGLE_USER_ITERATIONS" == "" ]]; then
 	echo "You must provide the scale as a parameter in terms of Gigabytes, true/false to run queries with EXPLAIN ANALYZE option, true/false to use random distrbution, multi-user count, and the number of sql iterations."
@@ -20,10 +21,10 @@ fi
 step="score"
 init_log $step
 
-load_time=$(psql -v ON_ERROR_STOP=1 -q -t -A -c "select sum(extract('epoch' from duration)) from tpcds_reports.load where tuples > 0")
-analyze_time=$(psql -v ON_ERROR_STOP=1 -q -t -A -c "select sum(extract('epoch' from duration)) from tpcds_reports.load where tuples = 0")
-queries_time=$(psql -v ON_ERROR_STOP=1 -q -t -A -c "select sum(extract('epoch' from duration)) from (SELECT split_part(description, '.', 2) AS id,  min(duration) AS duration FROM tpcds_reports.sql GROUP BY split_part(description, '.', 2)) as sub")
-concurrent_queries_time=$(psql -v ON_ERROR_STOP=1 -q -t -A -c "select sum(extract('epoch' from duration)) from tpcds_testing.sql")
+load_time=$(psql -d $DBNAME -v ON_ERROR_STOP=1 -q -t -A -c "select sum(extract('epoch' from duration)) from tpcds_reports.load where tuples > 0")
+analyze_time=$(psql -d $DBNAME -v ON_ERROR_STOP=1 -q -t -A -c "select sum(extract('epoch' from duration)) from tpcds_reports.load where tuples = 0")
+queries_time=$(psql -d $DBNAME -v ON_ERROR_STOP=1 -q -t -A -c "select sum(extract('epoch' from duration)) from (SELECT split_part(description, '.', 2) AS id,  min(duration) AS duration FROM tpcds_reports.sql GROUP BY split_part(description, '.', 2)) as sub")
+concurrent_queries_time=$(psql -d $DBNAME -v ON_ERROR_STOP=1 -q -t -A -c "select sum(extract('epoch' from duration)) from tpcds_testing.sql")
 
 q=$((3*MULTI_USER_COUNT*99))
 

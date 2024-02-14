@@ -14,6 +14,7 @@ PARTITION_EVERY_FACTOR=$6
 EXTRA_TPCDS_QUERIES=$8
 HEAP_ONLY=${21}
 REFERENCE_TABLE_TYPE=${26}
+DBNAME=${27}
 
 echo "HEAP_ONLY: $HEAP_ONLY"
 echo "REFERENCE_TABLE_TYPE: $REFERENCE_TABLE_TYPE"
@@ -100,8 +101,8 @@ for i in $(ls $PWD/*.$filter.*.sql); do
 		DISTRIBUTED_BY=""
 	fi
 
-	#echo "psql -v ON_ERROR_STOP=1 -q -P pager=off -f $i -v SMALL_STORAGE=\"$SMALL_STORAGE\" -v MEDIUM_STORAGE=\"$MEDIUM_STORAGE\" -v LARGE_STORAGE=\"$LARGE_STORAGE\" -v DISTRIBUTED_BY=\"$DISTRIBUTED_BY\""
-	PGOPTIONS='--client-min-messages=warning' psql -v ON_ERROR_STOP=1 -q -P pager=off -f $i -v SMALL_STORAGE="$SMALL_STORAGE" -v MEDIUM_STORAGE="$MEDIUM_STORAGE" -v LARGE_STORAGE="$LARGE_STORAGE" -v DISTRIBUTED_BY="$DISTRIBUTED_BY" -v EVERY_WEB_RETURNS="$EVERY_WEB_RETURNS" -v EVERY_CATALOG_RETURNS="$EVERY_CATALOG_RETURNS" -v EVERY_STORE_SALES="$EVERY_STORE_SALES" -v EVERY_CATALOG_SALES="$EVERY_CATALOG_SALES" -v EVERY_WEB_SALES="$EVERY_WEB_SALES" -v EVERY_STORE_RETURNS="$EVERY_STORE_RETURNS" -v EVERY_INVENTORY="$EVERY_INVENTORY" -v SCHEMA=$1
+	#echo "psql -d $DBNAME -v ON_ERROR_STOP=1 -q -P pager=off -f $i -v SMALL_STORAGE=\"$SMALL_STORAGE\" -v MEDIUM_STORAGE=\"$MEDIUM_STORAGE\" -v LARGE_STORAGE=\"$LARGE_STORAGE\" -v DISTRIBUTED_BY=\"$DISTRIBUTED_BY\""
+	PGOPTIONS='--client-min-messages=warning' psql -d $DBNAME -v ON_ERROR_STOP=1 -q -P pager=off -f $i -v SMALL_STORAGE="$SMALL_STORAGE" -v MEDIUM_STORAGE="$MEDIUM_STORAGE" -v LARGE_STORAGE="$LARGE_STORAGE" -v DISTRIBUTED_BY="$DISTRIBUTED_BY" -v EVERY_WEB_RETURNS="$EVERY_WEB_RETURNS" -v EVERY_CATALOG_RETURNS="$EVERY_CATALOG_RETURNS" -v EVERY_STORE_SALES="$EVERY_STORE_SALES" -v EVERY_CATALOG_SALES="$EVERY_CATALOG_SALES" -v EVERY_WEB_SALES="$EVERY_WEB_SALES" -v EVERY_STORE_RETURNS="$EVERY_STORE_RETURNS" -v EVERY_INVENTORY="$EVERY_INVENTORY" -v SCHEMA=$1
 	log
 done
 }
@@ -143,7 +144,7 @@ if [ "$filter" == "gpdb" ]; then
 		counter=0
 
 		if [[ "$VERSION" == "gpdb_6" || "$VERSION" == "gpdb_7" ]]; then
-			for x in $(psql -v ON_ERROR_STOP=1 -q -A -t -c "select rank() over(partition by g.hostname order by g.datadir), g.hostname from gp_segment_configuration g where g.content >= 0 and g.role = 'p' order by g.hostname"); do
+			for x in $(psql -d $DBNAME -v ON_ERROR_STOP=1 -q -A -t -c "select rank() over(partition by g.hostname order by g.datadir), g.hostname from gp_segment_configuration g where g.content >= 0 and g.role = 'p' order by g.hostname"); do
 				CHILD=$(echo $x | awk -F '|' '{print $1}')
 				EXT_HOST=$(echo $x | awk -F '|' '{print $2}')
 				PORT=$(($GPFDIST_PORT + $CHILD))
@@ -158,7 +159,7 @@ if [ "$filter" == "gpdb" ]; then
 				counter=$(($counter + 1))
 			done
 		else
-			for x in $(psql -v ON_ERROR_STOP=1 -q -A -t -c "select rank() over (partition by g.hostname order by p.fselocation), g.hostname from gp_segment_configuration g join pg_filespace_entry p on g.dbid = p.fsedbid join pg_tablespace t on t.spcfsoid = p.fsefsoid where g.content >= 0 and g.role = 'p' and t.spcname = 'pg_default' order by g.hostname"); do
+			for x in $(psql -d $DBNAME -v ON_ERROR_STOP=1 -q -A -t -c "select rank() over (partition by g.hostname order by p.fselocation), g.hostname from gp_segment_configuration g join pg_filespace_entry p on g.dbid = p.fsedbid join pg_tablespace t on t.spcfsoid = p.fsefsoid where g.content >= 0 and g.role = 'p' and t.spcname = 'pg_default' order by g.hostname"); do
 				CHILD=$(echo $x | awk -F '|' '{print $1}')
 				EXT_HOST=$(echo $x | awk -F '|' '{print $2}')
 				PORT=$(($GPFDIST_PORT + $CHILD))
@@ -175,8 +176,8 @@ if [ "$filter" == "gpdb" ]; then
 		fi
 		LOCATION+="'"
 
-		#echo "psql -v ON_ERROR_STOP=1 -q -a -P pager=off -f $i -v LOCATION=\"$LOCATION\""
-		PGOPTIONS='--client-min-messages=warning' psql -v ON_ERROR_STOP=1 -q -P pager=off -f $i -v LOCATION="$LOCATION" 
+		#echo "psql -d $DBNAME -v ON_ERROR_STOP=1 -q -a -P pager=off -f $i -v LOCATION=\"$LOCATION\""
+		PGOPTIONS='--client-min-messages=warning' psql -d $DBNAME -v ON_ERROR_STOP=1 -q -P pager=off -f $i -v LOCATION="$LOCATION" 
 
 		log
 	done

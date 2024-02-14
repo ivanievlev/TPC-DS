@@ -8,6 +8,8 @@ RANDOM_DISTRIBUTION=$3
 MULTI_USER_COUNT=$4
 EXCLUDE_HEAVY_QUERIES=$7
 SQL_ON_ERROR_STOP=${10}
+DBNAME=${27}
+
 
 if [[ "$GEN_DATA_SCALE" == "" || "$EXPLAIN_ANALYZE" == "" || "$RANDOM_DISTRIBUTION" == "" || "$MULTI_USER_COUNT" == "" ]]; then
         echo "You must provide the scale as a parameter in terms of Gigabytes, true/false to run queries with EXPLAIN ANALYZE option, true/false to use random distrbution, and the number of concurrent users to run."
@@ -81,8 +83,8 @@ if [ "$file_count" -ne "$MULTI_USER_COUNT" ]; then
 
 	for x in $(seq 1 $MULTI_USER_COUNT); do
 		session_log=$PWD/../log/testing_session_$x.log
-		echo "$PWD/test.sh $GEN_DATA_SCALE $x $EXPLAIN_ANALYZE"
-		$PWD/test.sh $GEN_DATA_SCALE $x $EXPLAIN_ANALYZE $EXCLUDE_HEAVY_QUERIES $SQL_ON_ERROR_STOP |& tee $session_log &
+		echo "$PWD/test.sh $GEN_DATA_SCALE $x $EXPLAIN_ANALYZE $DBNAME"
+		$PWD/test.sh $GEN_DATA_SCALE $x $EXPLAIN_ANALYZE $EXCLUDE_HEAVY_QUERIES $SQL_ON_ERROR_STOP $DBNAME |& tee $session_log &
 	done
 
 	sleep 60
