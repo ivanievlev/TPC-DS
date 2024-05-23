@@ -3,7 +3,7 @@
 
 - Added support for Greenplum 7.x 
 - Changed compression options from quicklz to zstd
-- Added new paramaters
+- Added new parameters
 
 ## Installation
 
@@ -51,7 +51,7 @@ tail -f tpcds.log
 - RUN_MULTI_USER_REPORT="true"
 - RUN_SCORE="true"
 
-## New parameters
+## New Arenadata parameters
 
 - PARTITION_EVERY_FACTOR="1"
     
@@ -73,3 +73,42 @@ tail -f tpcds.log
 - SQL_ON_ERROR_STOP="true"
 
 	``It is used to stop in case of every error. Essentially, errors shouldn't coour in stable environment. But for massive workload in unstable network you may specify "false" to skip trivial errors and make sure your test will complete.``
+
+- DBNAME="gp_tpcds"
+
+	``Default is gp_tpcds. Parameter was introduces to avoid conflicts of database "gpadmin" in case of concurrent TPC-H benchmark``
+
+- RUN_SQL_FROM_ROLE="gpadmin"
+
+	``We will run test from user that is set here. Default is gpadmin``
+
+- REFERENCE_TABLE_TYPE="aoco"
+
+	``Defines storage engine for tables with SMALL_STORAGE tag:
+		aoco: "appendonly=true, orientation=column"
+		aoro: "appendonly=true, orientation=row"
+		heap: "appendonly=false"
+	Default is "aoco", but in production system small reference tables are often updated/inserted and it make sense to set "heap" 
+``
+
+- HEAP_ONLY="false"
+
+	``Default FALSE means that all tables (with tags SMALL_STORAGE, MEDIUM_STORAGE, LARGE_STORAGE) are Append-optimized as common in Greenplum. If TRUE it is used to make all these tables are heap ("appendonly=false").``
+
+- SET_ORCA_OPTIMIZER="on"
+
+	``Default ON uses Greenplum-native ORCA optimizer, while OFF - Postgres optimizer for all queries``
+
+- MAKE_PREREQUISITES="false" and NETWORK_INTERFACE_JUMBOFRAME="eth0"
+
+	``Default behaviour with MAKE_PREREQUISITES="false" does nothing. If MAKE_PREREQUISITES="true" then we will set mtu 9000 on all network interfaces with 		NETWORK_INTERFACE_JUMBOFRAME = "<name>" in all hosts (Jumbo Frame) and 	force start the cluster if it is not started``
+
+## Parameters that are set during 02_init phase: Resource Groups limits (only for admin_group) and network sysctl parameters 
+
+- net_core_rmem="26214400"
+- net_core_wmem="26214400"
+- rg6_memory_limit="80"
+- rg6_memory_shared_quota="80"
+- rg6_concurrency="100"
+- rg6_cpu_rate_limit="70"
+- rg7_cpu_hard_quota_limit="100"
