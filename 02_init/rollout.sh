@@ -225,6 +225,10 @@ if [[ "$VERSION" == *"gpdb"* ]]; then
 	#set_segment_bashrc
 	check_gucs
 	copy_config
+  set_adcc_superuser
+  set_optimizer
+
+
 
 	
 	if [[ "$VERSION" == "gpdb_6" ]]; then
@@ -252,9 +256,8 @@ if [[ "$VERSION" == *"gpdb"* ]]; then
 	set_workfile_limits 
 	set_net_core_mem
 fi
+
 set_search_path
-set_adcc_superuser
-set_optimizer
 create_run_sql_from_role
 export PGUSER=$RUN_SQL_FROM_ROLE
 log
