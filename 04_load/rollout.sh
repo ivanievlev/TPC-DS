@@ -68,6 +68,20 @@ start_gpfdist()
 	fi
 }
 
+get_count_load_data()
+{
+	count="0"
+	for i in $(cat $PWD/../segment_hosts.txt); do
+		next_count=$(ssh -o ConnectTimeout=0 -n -f $i "bash -c 'ps -ef | grep $table_name | grep -v grep | wc -l'" 2>&1 || true)
+		check="^[0-9]+$"
+		if ! [[ $next_count =~ $check ]] ; then
+			next_count="1"
+		fi
+		count=$(($count + $next_count))
+	done
+}
+
+
 if [ "$TRUNCATE_BEFORE_LOAD" == "true" ]; then
 	echo "psql -d $DBNAME -v ON_ERROR_STOP=1 -f 000.truncate.sql"
 	psql -d $DBNAME -v ON_ERROR_STOP=1 -f $PWD/000.truncate.sql
@@ -110,10 +124,21 @@ else
 				start_log
 				filename="'""$filename""'"
 				echo "psql -d $DBNAME -v ON_ERROR_STOP=1 -f $i -v filename=\"$filename\" | grep COPY | awk -F ' ' '{print \$2}'"
-				tuples=$(psql -d $DBNAME -v ON_ERROR_STOP=1 -f $i -v filename="$filename" | grep COPY | awk -F ' ' '{print $2}'; exit ${PIPESTATUS[0]})
-				log $tuples
+				#tuples=$(psql -d $DBNAME -v ON_ERROR_STOP=1 -f $i -v filename="$filename" | grep COPY | awk -F ' ' '{print $2}'; exit ${PIPESTATUS[0]})
+				psql -d $DBNAME -v ON_ERROR_STOP=1 -f $i -v filename="$filename" &
+
+				#log $tuples
 			fi
 		done
+	  echo ""
+    get_count_load_data
+    echo "Now loading $table_name data.  This make take a while."
+    echo -ne "Loading $table_name data"
+    while [ "$count" -gt "0" ]; do
+	    echo -ne "."
+	    sleep 5
+	    get_count_load_data
+    done
 	done
 fi
 
